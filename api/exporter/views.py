@@ -31,6 +31,41 @@ class CategoryView(View):
         }
         return JsonResponse(data, status=200)
 
+    @admin_decorator
+    def post(self, request):
+        data       = json.loads(request.body)
+        category, is_create = Category.objects.get_or_create(
+            name = data['category']
+        )
+        
+        if not is_create:
+            return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+        return JsonResponse({'message':'SUCCESS'}, status=201)
+    
+    @admin_decorator
+    def patch(self, request):
+        data                = json.loads(request.body)
+        category_id         = data['category_id']
+        feature_category_id = data['feature_category_id']
+
+        if not Category.objects.filter(id=category_id).exists:
+            return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400) 
+            
+        if not Category.objects.filter(id=feature_category_id).exists:
+            return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+
+        Exporter.objects.filter(category_id = category_id).update(category_id=feature_category_id)
+        Category.objects.filter(id=category_id).delete()
+        return JsonResponse({'message':'SUCCESS'}, status=200)
+
+    @admin_decorator
+    def delete(self, request, category_id):
+        if not Category.objects.filter(id=category_id).exists:
+            return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+        Exporter.objects.filter(category_id=category_id).delete()
+        Category.objects.filter(id=category_id).delete()
+        return JsonResponse({'message':'SUCCESS'}, status=200)
+
 class ExporterView(View):
     def get_repo(self, github_token, repo_url):
         headers     = {'Authorization' : 'token ' + github_token} 

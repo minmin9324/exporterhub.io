@@ -15,7 +15,9 @@ import sortFilterReducer from "./sortFilterReducer";
 import darkThemeReducer from "./darkThemeReducer";
 import adminAddReducer from "./adminAddReducer";
 import adminAddTypeReducer from "./adminAddTypeReducer";
+import alertRuleEdittingReducer from "./alertRuleEdittingReducer";
 export default combineReducers({
+  alertRuleEdittingReducer,
   categoryReducer,
   tokenReducer,
   loginReducer,

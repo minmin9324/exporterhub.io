@@ -13,6 +13,10 @@ const GET_LOGIN_STATE = "GET_LOGIN_STATE";
 const TARGET_UNFORK_REPO = "TARGET_UNFORK_REPO";
 const GET_ADMIN_STATE = "GET_ADMIN_STATE";
 const GET_DARK_THEME = "GET_DARK_THEME";
+const EDITTING_ALERT_RULE = "EDITTING_ALERT_RULE";
+// const EDITTING_ALERT_RULE_FILENAME = "EDITTING_ALERT_RULE_FILENAME";
+// const EDITTING_ALERT_RULE_DESCRIPTION = "EDITTING_ALERT_RULE_DESCRIPTION";
+
 export const adminTypeAdd = (payload) => ({
   type: ADD_ADMIN_TYPE_STATE,
   payload,
@@ -76,3 +80,15 @@ export const getAdminState = (payload) => ({
   type: GET_ADMIN_STATE,
   payload,
 });
+export const edittingAlertRule = (payload) => ({
+  type: EDITTING_ALERT_RULE,
+  payload,
+});
+// export const edittingAlertRuleFileName = (payload) => ({
+//   type: EDITTING_ALERT_RULE_FILENAME,
+//   payload,
+// });
+// export const edittingAlertRuleDescription = (payload) => ({
+//   type: EDITTING_ALERT_RULE_DESCRIPTION,
+//   payload,
+// });
