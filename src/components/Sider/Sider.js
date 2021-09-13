@@ -3,29 +3,31 @@ import { useSelector, useDispatch } from "react-redux";
 import { filterByCate } from "../../store/actions/exporterActions";
 import styled from "styled-components";
 import { AiFillSetting } from "react-icons/ai";
-import { RiAddBoxLine } from "react-icons/ri";
-import { FiMinus } from "react-icons/fi";
-import { GrFormAdd } from "react-icons/gr";
+import { FiMinus, FiPlus } from "react-icons/fi";
 import { CATEGORIES_API } from "../../config";
 import axios from "axios";
 import ListDeleteModal from "../Modal/ListDeleteModal";
+import { Fragment } from "react";
 
 const Sider = () => {
   const dispatch = useDispatch();
   const categories = useSelector((store) => store.categoryReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
-  const [categoryAct, setcategoryAct] = useState(0);
-  const handleClickCategoryAct = (id) => {
-    setcategoryAct(id);
-  };
-
   const isAdmin = useSelector((store) => store.adminReducer);
   const [edit, setEdit] = useState(false);
   const [addCategoryName, setAddCategoryName] = useState("");
   const [deletecategory, setDeletecategory] = useState(false);
+  const [categoryAct, setcategoryAct] = useState(0);
+  const [alert, setAlert] = useState(false);
+
+  const handleClickCategoryAct = (id) => {
+    setcategoryAct(id);
+  };
 
   const addCategory = (editType) => {
-    if (editType === "add" && addCategoryName) {
+    if (editType === "add" && !addCategoryName) {
+      setAlert(true);
+    } else if (editType === "add" && addCategoryName) {
       axios({
         method: "post",
         url: `${CATEGORIES_API}`,
@@ -58,72 +60,91 @@ const Sider = () => {
   };
 
   return (
-    <CategoryList dark={changeTheme}>
-      <Title dark={changeTheme}>
-        CATEGORIES
-        {isAdmin && <AiFillSetting onClick={() => setEdit((prev) => !prev)} />}
-      </Title>
-
-      {edit && (
-        <div>
-          <Category
-            as="input"
-            onChange={({ target }) => setAddCategoryName(target.value)}
-          ></Category>
-          <GrFormAdd className="addCategory" onClick={() => addCategory("add")} />
-        </div>
-      )}
-      {deletecategory && (
-        <ListDeleteModal
-          categoriesList={categories}
-          deletecategoryId={deletecategory.category_id}
-          deletecategoryName={deletecategory.category_name}
-          setDeletecategory={setDeletecategory}
-        />
-      )}
-
-      <Category
-        dark={changeTheme}
-        edit={edit}
-        active={0 === categoryAct}
-        onClick={(e) => {
-          handleClickCategoryAct(0);
-          callDispatch(e);
-        }}
-      >
-        All
-      </Category>
-      {categories &&
-        categories.map((category) => (
-          <Category
-            edit={edit}
-            dark={changeTheme}
-            active={category.category_id === categoryAct}
-          >
-            <Div
-              onClick={(e) => {
-                handleClickCategoryAct(category.category_id);
-                callDispatch(e);
+    <div>
+      <CategoryList dark={changeTheme}>
+        <Title dark={changeTheme}>
+          CATEGORIES
+          {isAdmin && (
+            <AiFillSetting
+              className="edit"
+              onClick={() => {
+                setEdit((prev) => !prev);
+                setAlert(false);
               }}
-            >
-              {category.category_name}
-            </Div>
-            {edit && (
-              <div>
-                <FiMinus onClick={() => addCategory(category)} />
-              </div>
+            />
+          )}
+        </Title>
+
+        {edit && (
+          <Fragment>
+            <Title>
+              <Category
+                as="input"
+                onChange={({ target }) => {
+                  setAddCategoryName(target.value);
+                  setAlert(false);
+                }}
+              ></Category>
+              <FiPlus className="edit" onClick={() => addCategory("add")} />
+            </Title>
+            {alert && (
+              <Title alert="alert">Please enter the category name</Title>
             )}
-          </Category>
-        ))}
-    </CategoryList>
+          </Fragment>
+        )}
+        {deletecategory && (
+          <ListDeleteModal
+            categoriesList={categories}
+            deletecategoryId={deletecategory.category_id}
+            deletecategoryName={deletecategory.category_name}
+            setDeletecategory={setDeletecategory}
+          />
+        )}
+
+        <Category
+          default="All"
+          dark={changeTheme}
+          edit={edit}
+          active={0 === categoryAct}
+          onClick={(e) => {
+            handleClickCategoryAct(0);
+            callDispatch(e);
+          }}
+        >
+          All
+        </Category>
+        {categories &&
+          categories.map((category) => (
+            <Category
+              edit={edit}
+              dark={changeTheme}
+              active={category.category_id === categoryAct}
+            >
+              <Div
+                title={category.category_name}
+                onClick={(e) => {
+                  handleClickCategoryAct(category.category_id);
+                  callDispatch(e);
+                }}
+              >
+                {category.category_name}
+              </Div>
+              {edit && (
+                <DeleteButton onClick={() => addCategory(category)}>
+                  <FiMinus />
+                </DeleteButton>
+              )}
+            </Category>
+          ))}
+      </CategoryList>
+    </div>
   );
 };
 
 const CategoryList = styled.ul`
-  border: 1px solid red;
   width: 200px;
-  height: 450px;
-  margin-bottom: 270px;
+  min-height: 450px;
+  padding: 10px 0px;
   line-height: 1.5;
   background-color: ${(props) => (props.dark ? "#242526" : "#ffffff")};
   border-radius: 5px;
@@ -137,12 +158,29 @@ const CategoryList = styled.ul`
 `;
 
 const Title = styled.li`
-  padding: 10px;
-  color: ${(props) => (props.dark ? "#f5f6f7" : "#999")};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: ${(props) => (props.alert ? "15px" : "large")};
+  padding: 5px 5px 5px 10px;
+  color: ${(props) => (props.alert ? "red" : props.dark ? "#f5f6f7" : "#999")};
+  .edit {
+    cursor: pointer;
+  }
 `;
 
 const Div = styled.div`
+  padding-left: 10px;
+  padding-right: 20px;
   width: 100%;
+  flex: 8;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
+
+const DeleteButton = styled.div`
+  padding: 0px 10px;
+  flex: 2;
 `;
 
 const Category = styled.li`
@@ -150,7 +188,7 @@ const Category = styled.li`
   align-items: ${({ edit }) => edit && "center"};
   justify-content: ${({ edit }) => edit && "space-between"};
   position: relative;
-  padding: 3px 10px;
+  padding: ${(props) => (props.default === "All" ? "3px 10px" : "3px")};
   background: ${({ active }) => active && "#eee"};
   cursor: pointer;
   color: ${(props) => (props.dark ? "#f5f6f7" : "black")};

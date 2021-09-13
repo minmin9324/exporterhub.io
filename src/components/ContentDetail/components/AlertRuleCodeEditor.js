@@ -17,7 +17,6 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
   const [fileInfo, setFileInfo] = useState({ fileName: "", description: "" });
-  console.log(fileInfo);
   useEffect(() => {
     setBeforeEditting(alertInfo === "" ? "" : alertInfo[0].yamlContent);
     setFileInfo(

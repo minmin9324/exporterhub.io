@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { FiEdit } from "react-icons/fi";
 import { BiUndo } from "react-icons/bi";
-import AlertRuleCodeEditor from "./AlertRuleCodeEditor";
+import AlertRuleCodeEditor from "./AlertRuleCodeEditor2";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import NoData from "./NoData";
 import { Fragment } from "react";
@@ -14,11 +14,7 @@ const AlertRuleDataviewer = ({
   isEditMode,
   alertRuleCsvInfo,
   select,
-  setBeforeEditting,
-  setEdittingData,
 }) => {
-  console.log(alertRuleCsvInfo);
-
   const isAdmin = useSelector((store) => store.adminReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const emty =
@@ -76,15 +72,7 @@ const AlertRuleDataviewer = ({
             )}
           </Data>
         ) : (
-          <AlertRuleCodeEditor
-            select={select}
-            setBeforeEditting={setBeforeEditting}
-            setEdittingData={setEdittingData}
-            alertInfo={alertInfo}
-            handleMode={handleMode}
-            title={title}
-            type={type}
-          />
+          <AlertRuleCodeEditor alertInfo={alertInfo} handleMode={handleMode} />
         )}
       </div>
     </>

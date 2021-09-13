@@ -12,7 +12,6 @@ const Alert = ({ title }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [modify, setModify] = useState(false);
   const [select, setSelect] = useState(0);
-  const [beforeEditting, setBeforeEditting] = useState("");
 
   const handleMode = () => {
     setIsEditMode(!isEditMode);
@@ -24,10 +23,6 @@ const Alert = ({ title }) => {
   useEffect(() => {
     getData();
   }, []);
-
-  useEffect(() => {
-    getData();
-  }, [isEditMode]);
 
   const getData = () => {
     // const TOKEN = sessionStorage.getItem("access_token");
@@ -62,14 +57,12 @@ const Alert = ({ title }) => {
         select={select}
         isEditMode={isEditMode}
         setModify={setModify}
-        beforeEditting={beforeEditting}
         handleMode={handleMode}
       />
       <Container>
         <AlertRuleDataviewer
           select={select}
           isEditMode={isEditMode}
-          setBeforeEditting={setBeforeEditting}
           modify={modify}
           handleMode={handleMode}
           title={title}

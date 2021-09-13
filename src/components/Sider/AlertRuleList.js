@@ -20,11 +20,17 @@ const List = ({
 }) => {
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
+  const beforeEditAlert = useSelector(
+    (store) => store.alertRuleBeforeEditReducer
+  );
+
   const [saveEdit, setSaveEdit] = useState(false);
   const [moveId, setMoveId] = useState(false);
   const [deleteAlertRule, setDeleteAlertRule] = useState(false);
-  const dontSaved = modify && edittingAlert !== beforeEditting;
-  console.log(edittingAlert, beforeEditting);
+  const dontSaved =
+    modify && JSON.stringify(edittingAlert) !== JSON.stringify(beforeEditAlert);
+  console.log(JSON.stringify(edittingAlert));
+  console.log(JSON.stringify(beforeEditAlert));
   const handleAddAlertRule = () => {
     if (alertRuleCsvInfo.length !== 0) {
       if (select === "New") {
@@ -91,7 +97,6 @@ const List = ({
     }
   };
 
-  console.log(select);
   return (
     <div>
       <AlertList dark={changeTheme}>

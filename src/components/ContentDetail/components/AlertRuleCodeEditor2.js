@@ -11,32 +11,32 @@ import {
   edittingAlertRule,
   edittingAlertRuleFileName,
   edittingAlertRuleDescription,
+  beforeEdittingAlertRule,
 } from "../../../store/actions/exporterActions";
 // import { API_SURVER } from "../../../config";
 import { useParams } from "react-router";
 
-const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
+const AlertRuleCodeEditor = ({ alertInfo, handleMode }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  console.log(alertInfo, "asd");
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
-  const compare = alertInfo === "" ? "" : alertInfo.id;
-  console.log(edittingAlert);
 
   useEffect(() => {
-    setBeforeEditting(
-      alertInfo === ""
-        ? ""
-        : {
-            fileName: alertInfo[0].githubInfo.slice(
-              alertInfo[0].githubInfo.lastIndexOf("/") + 1
-            ),
-            description: alertInfo[0].description,
-            content: alertInfo[0].yamlContent,
-          }
+    dispatch(
+      beforeEdittingAlertRule(
+        alertInfo === ""
+          ? {}
+          : {
+              fileName: alertInfo[0].githubInfo.slice(
+                alertInfo[0].githubInfo.lastIndexOf("/") + 1,
+                -5
+              ),
+              description: alertInfo[0].description,
+              content: alertInfo[0].yamlContent,
+            }
+      )
     );
-
     dispatch(
       edittingAlertRule(alertInfo === "" ? "" : alertInfo[0].yamlContent)
     );
@@ -50,20 +50,18 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
         alertInfo === ""
           ? ""
           : alertInfo[0].githubInfo.slice(
-              alertInfo[0].githubInfo.lastIndexOf("/") + 1
+              alertInfo[0].githubInfo.lastIndexOf("/") + 1,
+              -5
             )
       )
     );
-  }, [compare]);
+  }, [alertInfo]);
 
   const onChange = (value) => {
     dispatch(edittingAlertRule(value));
   };
 
   const handleFileInfo = ({ target }) => {
-    // setFileInfo((prev) => {
-    //   return { ...prev, [target.id]: target.value };
-    // });
     if (target.id === "codeEdit") {
       dispatch(edittingAlertRule(target.value));
     } else if (target.id === "fileName") {
@@ -96,23 +94,26 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
   return (
     <Container dark={changeTheme}>
       <EditorContainer>
-        <Inputbox>
-          <Input
-            id="fileName"
-            value={edittingAlert.fileName}
-            type="text"
-            placeholder="fileName"
-            dark={changeTheme}
-            onChange={handleFileInfo}
-          />
+        <Inputbox className="prevent">
+          <FileName>
+            <Input
+              id="fileName"
+              value={edittingAlert.fileName}
+              type="text"
+              placeholder="fileName"
+              dark={changeTheme}
+              onChange={handleFileInfo}
+            />
+            <p> _alert.yaml</p>
+          </FileName>
           <Input
             id="description"
             as="textarea"
             name="content"
             placeholder="description"
-            cols="90"
-            rows="3"
             value={edittingAlert.description}
+            cols="150"
+            rows="3"
             dark={changeTheme}
             onChange={handleFileInfo}
           />
@@ -126,7 +127,7 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
           /> */}
         </Inputbox>
         <AceEditor
-          id="codeEdit"
+          id="codeEider"
           width="100%"
           height="100%"
           placeholder="Placeholder Text"
@@ -134,7 +135,7 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
           theme="github"
           name="blah2"
           // onLoad={this.onLoad}
-          onChange={handleFileInfo}
+          onChange={onChange}
           fontSize={14}
           showPrintMargin={true}
           showGutter={false}
@@ -146,6 +147,8 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
             enableSnippets: true,
             showLineNumbers: false,
             tabSize: 2,
+
+            overscrollBehaviorX: "none",
           }}
         />
       </EditorContainer>
@@ -227,6 +230,15 @@ const Inputbox = styled.div`
   align-items: flex-start;
 `;
 
+const FileName = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  p {
+    padding-left: 7px;
+  }
+`;
+
 const Input = styled.input`
   @media ${({ theme }) => theme.media.mobile} {
     width: 100%;
@@ -235,6 +247,7 @@ const Input = styled.input`
   width: ${(props) => (props.placeholder === "fileName" ? "400px" : "100%")};
   height: ${(props) => (props.as ? "" : "30px")};
   resize: ${(props) => (props.as ? "none" : "")};
+  word-break: keep-all;
   margin: ${(props) =>
     props.placeholder === "fileName" ? "" : "20px 0px 20px"};
   border: 1px solid rgba(0, 0, 0, 0.2);

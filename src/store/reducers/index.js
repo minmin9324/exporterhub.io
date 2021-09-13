@@ -16,6 +16,7 @@ import darkThemeReducer from "./darkThemeReducer";
 import adminAddReducer from "./adminAddReducer";
 import adminAddTypeReducer from "./adminAddTypeReducer";
 import alertRuleEdittingReducer from "./alertRuleEdittingReducer";
+import alertRuleBeforeEditReducer from "./alertRuleBeforeEditReducer";
 export default combineReducers({
   alertRuleEdittingReducer,
   categoryReducer,
@@ -34,4 +35,5 @@ export default combineReducers({
   darkThemeReducer,
   adminAddReducer,
   adminAddTypeReducer,
+  alertRuleBeforeEditReducer,
 });
