@@ -20,7 +20,7 @@ const AdminAddModal = ({
         <h4>Are you sure to invite "this user" as an admin ?</h4>
         <Container>
           <button onClick={() => addAdmin(userName, userType)}>Yes</button>
-          <button onClick={handleModal}>Cancle</button>
+          <button onClick={handleModal}>Cancel</button>
         </Container>
       </Div>
     </ModalContainer>

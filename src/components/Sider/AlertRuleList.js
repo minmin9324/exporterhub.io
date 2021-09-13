@@ -6,6 +6,7 @@ import { GrEdit, GrFormAdd } from "react-icons/gr";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import DeleteModal from "../Modal/DeleteModal";
+import { set } from "js-cookie";
 
 const List = ({
   modify,
@@ -23,23 +24,8 @@ const List = ({
   const [moveId, setMoveId] = useState(false);
   const [deleteAlertRule, setDeleteAlertRule] = useState(false);
   const dontSaved = modify && edittingAlert !== beforeEditting;
-  // const compareEditting =
-  //   edittingAlert.fileName + edittingAlert.description + edittingAlert.content;
-  // const compareBefore =
-  //   beforeEditting.fileName +
-  //   beforeEditting.description +
-  //   beforeEditting.content;
-  console.log(
-    edittingAlert,
-    beforeEditting
-    // compareEditting,
-    // compareBefore,
-    // compareEditting === compareBefore
-  );
+  console.log(edittingAlert, beforeEditting);
   const handleAddAlertRule = () => {
-    if (dontSaved) {
-      setSaveEdit(true);
-    }
     if (alertRuleCsvInfo.length !== 0) {
       if (select === "New") {
         setSelect(alertRuleCsvInfo[0].id);
@@ -59,8 +45,25 @@ const List = ({
     }
   };
 
+  const handleSaveModal = () => {
+    if (dontSaved) {
+      setSaveEdit(true);
+      setMoveId("New");
+    } else {
+      handleAddAlertRule();
+    }
+  };
+
   const handleSave = (answer) => {
-    answer === "Yes" && setSelect(moveId);
+    if (answer === "Yes") {
+      if (moveId === "New") {
+        handleAddAlertRule();
+      } else {
+        setSelect(moveId);
+        setModify(false);
+      }
+    }
+
     setSaveEdit(false);
   };
 
@@ -84,6 +87,7 @@ const List = ({
       setSaveEdit(true);
     } else {
       setSelect(alertRuleId);
+      setModify(false);
     }
   };
 
@@ -105,11 +109,6 @@ const List = ({
                       alert.githubInfo.lastIndexOf("/") + 1,
                       -5
                     );
-                    {
-                      /* if (github.length > 14) {
-                      github = github.slice(0, 14) + "...";
-                    } */
-                    }
                     return (
                       <Category
                         dark={changeTheme}
@@ -160,7 +159,7 @@ const List = ({
               <Category
                 addIcon={true}
                 isEditMode={isEditMode}
-                onClick={handleAddAlertRule}
+                onClick={handleSaveModal}
               >
                 <GrFormAdd size="30px" />
               </Category>

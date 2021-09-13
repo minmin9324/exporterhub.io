@@ -72,7 +72,7 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
   return (
     <Container dark={changeTheme}>
       <EditorContainer>
-        <Inputbox>
+        <Inputbox className="prevent">
           <FileName>
             <Input
               id="fileName"
@@ -125,6 +125,8 @@ const AlertRuleCodeEditor = ({ alertInfo, setBeforeEditting, handleMode }) => {
             enableSnippets: true,
             showLineNumbers: false,
             tabSize: 2,
+
+            overscrollBehaviorX: "none",
           }}
         />
       </EditorContainer>

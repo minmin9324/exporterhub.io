@@ -10,6 +10,7 @@ const AdminContent = ({
   setIsAdminDeleteModalActive,
   setSelectedAdmiin,
 }) => {
+  console.log(admin);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const handleAdminDelete = (e) => {
     setIsAdminDeleteModalActive(!isAdminDeleteModalActive);

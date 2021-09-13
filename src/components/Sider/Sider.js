@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { AiFillSetting } from "react-icons/ai";
 import { RiAddBoxLine } from "react-icons/ri";
 import { FiMinus } from "react-icons/fi";
+import { GrFormAdd } from "react-icons/gr";
 import { CATEGORIES_API } from "../../config";
 import axios from "axios";
 import ListDeleteModal from "../Modal/ListDeleteModal";
@@ -69,7 +70,7 @@ const Sider = () => {
             as="input"
             onChange={({ target }) => setAddCategoryName(target.value)}
           ></Category>
-          <RiAddBoxLine onClick={() => addCategory("add")} />
+          <GrFormAdd className="addCategory" onClick={() => addCategory("add")} />
         </div>
       )}
       {deletecategory && (

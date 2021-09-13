@@ -30,9 +30,11 @@ const Contetnt = () => {
       params: { type: navFilter, category: cateFilter, sort: sortFilter },
     })
       .then((res) => {
+        console.log(res);
         let resultExporters = res.data.exporters.filter((exporter) => {
           return exporter.name.toLowerCase().includes(searchFilter);
         });
+
         dispatch(allData(resultExporters));
       })
       .catch((err) => console.log(err));

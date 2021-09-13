@@ -37,18 +37,19 @@ const CardExporter = ({
     dispatch(targetUnforkRepo(id));
   };
   const deleteExporter = (answer) => {
-    console.log(exporter_id);
-    if (answer === "yes") {
+    if (answer === "Yes") {
+      console.log("dldk", exporter_id);
       axios({
         method: "delete",
-        url: `${EXPORTER_API}/${exporter_id}`,
+        url: `${EXPORTER_API}/exporter?exporter_id=${exporter_id}`,
         headers: {
           Authorization: sessionStorage.getItem("access_token"),
         },
       })
-        .then(() => {
+        .then((res) => {
           window.location.reload();
           setDeleteModal(false);
+          console.log(res);
         })
         .catch((error) => {
           // setFailMessage(error.response?.data.message);
