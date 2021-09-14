@@ -7,6 +7,7 @@ import {
   filterByCate,
 } from "../../store/actions/exporterActions";
 import { CATEGORIES_API } from "../../config";
+import Search from "../Header/Search";
 import RegisterModal from "../Modal/RegisterModal";
 const ContentMenu = ({ totaCount }) => {
   const [isModalActive, setIsModalActive] = useState(false);
@@ -41,33 +42,41 @@ const ContentMenu = ({ totaCount }) => {
     });
   }, []);
   return (
-    <Div>
-      {/* <span>{totalCount} items</span> */}
-      <SelectBox>
-        <Select dark={changeTheme} onChange={callDispatch}>
-          <option>All</option>
-          {categories &&
-            categories.map((category) => (
-              <option key={category.category_id}>
-                {category.category_name}
-              </option>
-            ))}
-        </Select>
-        <Sort dark={changeTheme}>
-          <select onChange={optionSelector}>
-            <option>Most popular</option>
-            <option>Recent</option>
-            <option>Trending</option>
-          </select>
-        </Sort>
-      </SelectBox>
-      {isAdmin && (
-        <Button dark={changeTheme} onClick={() => setIsModalActive(true)}>
-          <span>REGISTER</span>
-        </Button>
-      )}
-      {isModalActive && <RegisterModal cancleModal={cancleModal} />}
-    </Div>
+    <>
+      <Div>
+        {/* <span>{totalCount} items</span> */}
+        <SelectBox>
+          <Select dark={changeTheme} onChange={callDispatch}>
+            <option>All</option>
+            {categories &&
+              categories.map((category) => (
+                <option key={category.category_id}>
+                  {category.category_name}
+                </option>
+              ))}
+          </Select>
+          <Sort dark={changeTheme}>
+            <select onChange={optionSelector}>
+              <option>Most popular</option>
+              <option>Recent</option>
+              <option>Trending</option>
+            </select>
+          </Sort>
+        </SelectBox>
+        <SearchBox>
+          <Search />
+        </SearchBox>
+        {isAdmin && (
+          <Button dark={changeTheme} onClick={() => setIsModalActive(true)}>
+            <span>REGISTER</span>
+          </Button>
+        )}
+        {isModalActive && <RegisterModal cancleModal={cancleModal} />}
+      </Div>
+      <SearchMoileBox>
+        <Search />
+      </SearchMoileBox>
+    </>
   );
 };
 const Div = styled.div`
@@ -78,6 +87,7 @@ const Div = styled.div`
   font-size: 16px;
   @media ${({ theme }) => theme.media.mobile} {
     font-size: 13px;
+    margin-bottom: 10px;
   }
   select {
     outline: none;
@@ -87,13 +97,16 @@ const Div = styled.div`
     cursor: pointer;
   }
 `;
+
 const SelectBox = styled.div`
   display: flex;
+  align-items: center;
   font-size: 16px;
   @media ${({ theme }) => theme.media.mobile} {
     font-size: 13px;
   }
 `;
+
 const Select = styled.select`
   display: none;
   margin-right: 10px;
@@ -107,6 +120,7 @@ const Select = styled.select`
     color: ${(props) => (props.dark ? "#ffffff" : "black")};
   } */
 `;
+
 const Button = styled.button`
   display: flex;
   align-items: center;
@@ -117,6 +131,7 @@ const Button = styled.button`
   font-size: 12px;
   font-weight: 600;
 `;
+
 const Sort = styled.div`
   select {
     color: ${(props) => (props.dark ? "#ffffff" : "black")};
@@ -128,7 +143,21 @@ const Sort = styled.div`
 
   @media ${({ theme }) => theme.media.mobile} {
     position: relative;
-    top: 3px;
+  }
+`;
+
+const SearchMoileBox = styled.div`
+  display: none;
+  @media ${({ theme }) => theme.media.mobile} {
+    display: block;
+    margin-bottom: 10px;
+  }
+`;
+
+const SearchBox = styled.div`
+  display: block;
+  @media ${({ theme }) => theme.media.mobile} {
+    display: none;
   }
 `;
 export default ContentMenu;

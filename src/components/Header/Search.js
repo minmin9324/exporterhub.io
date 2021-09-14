@@ -20,12 +20,12 @@ const Search = () => {
 const Div = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 30px;
-  margin-right: auto;
+  /* margin-left: 30px;
+  margin-right: auto; */
   @media ${({ theme }) => theme.media.mobile} {
     position: relative;
     display: block;
-    margin: 15px 0 0;
+    /* margin: 15px 0 0; */
     /* display: none; */
   }
   .search_icon {
