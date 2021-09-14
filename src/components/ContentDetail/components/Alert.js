@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 // import axios from "axios";
 import AlertRuleDataviewer from "./AlertRuleDataviewer";
+import { useSelector } from "react-redux";
+
 // import { useParams } from "react-router";
 // import { API_SURVER } from "../../../config";
 import AlertRuleList from "../../Sider/AlertRuleList";
 
 const Alert = ({ title }) => {
   // const { id } = useParams();
+  const changeTheme = useSelector((store) => store.darkThemeReducer);
   const [alertRuleCsv, setAlertRuleCsv] = useState("default");
   const [isEditMode, setIsEditMode] = useState(false);
   const [modify, setModify] = useState(false);
@@ -50,16 +53,34 @@ const Alert = ({ title }) => {
 
   return (
     <Div>
-      <AlertRuleList
-        modify={modify}
-        alertRuleCsvInfo={alertRuleCsv}
-        setSelect={setSelect}
-        select={select}
-        isEditMode={isEditMode}
-        setModify={setModify}
-        handleMode={handleMode}
-      />
+      <div>
+        <AlertList dark={changeTheme}>
+          <AlertRuleList
+            modify={modify}
+            alertRuleCsvInfo={alertRuleCsv}
+            setSelect={setSelect}
+            select={select}
+            isEditMode={isEditMode}
+            setModify={setModify}
+            handleMode={handleMode}
+          />
+        </AlertList>
+      </div>
       <Container>
+        <div>
+          <MobileList dark={changeTheme}>
+            <AlertRuleList
+              mobile={true}
+              modify={modify}
+              alertRuleCsvInfo={alertRuleCsv}
+              setSelect={setSelect}
+              select={select}
+              isEditMode={isEditMode}
+              setModify={setModify}
+              handleMode={handleMode}
+            />
+          </MobileList>
+        </div>
         <AlertRuleDataviewer
           select={select}
           isEditMode={isEditMode}
@@ -83,6 +104,30 @@ const Div = styled.div`
     width: 100%;
   }
 `;
+
+const AlertList = styled.ul`
+  width: 200px;
+  margin-top: 60px;
+  line-height: 1.5;
+  background-color: ${(props) => (props.dark ? "#242526" : "#ffffff")};
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  @media ${({ theme }) => theme.media.mobile} {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+`;
+
+const MobileList = styled.ul`
+  display: none;
+  line-height: 1.5;
+  @media ${({ theme }) => theme.media.mobile} {
+    display: block;
+  }
+`;
+
 const Container = styled.div`
   ${({ theme }) => theme.container}
   position: relative;

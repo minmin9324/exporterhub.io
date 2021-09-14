@@ -34,6 +34,7 @@ const AlertRuleDataviewer = ({
           {title}
           {type}
         </ContentTitle>
+
         {isAdmin && (
           <div>
             <Button onClick={handleMode}>
@@ -54,17 +55,20 @@ const AlertRuleDataviewer = ({
             ) : (
               <Fragment>
                 {emty === false && alertInfo !== "" ? (
-                  <Fragment>
-                    <h5>
+                  <AlertContainer>
+                    <h1>
                       {alertInfo[0].githubInfo.slice(
                         alertInfo[0].githubInfo.lastIndexOf("/") + 1
                       )}
-                    </h5>
-                    <p>{"description : " + alertInfo[0].description}</p>
+                    </h1>
+                    <div>
+                      <h3>Description</h3>
+                      <p>{alertInfo[0].description}</p>
+                    </div>
                     <Content dark={changeTheme}>
                       {alertInfo[0].yamlContent}
                     </Content>
-                  </Fragment>
+                  </AlertContainer>
                 ) : (
                   <NoData mdSha={!emty} />
                 )}
@@ -85,9 +89,11 @@ const Header = styled.header`
   justify-content: space-between;
 `;
 
-const ContentTitle = styled.h4`
-  font-size: 30px;
+const ContentTitle = styled.h1`
+  margin: 15px 0 0pxpx;
+  line-height: 1.25;
   font-weight: 500;
+  color: ${(props) => props.dark && "#f5f6f7"};
   letter-spacing: 0.08rem;
 
   @media ${({ theme }) => theme.media.mobile} {
@@ -100,6 +106,50 @@ const ContentTitle = styled.h4`
   color: ${(props) => props.dark && "#f5f6f7"}; ;
 `;
 
+const AlertContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  h1 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 10px;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #eaecef;
+    font-size: 25px;
+
+    letter-spacing: 0.08rem;
+    @media ${({ theme }) => theme.media.mobile} {
+      font-size: 17px;
+    }
+  }
+  h3 {
+    font-size: 20px;
+    font-weight: 500;
+    padding-bottom: 10px;
+    @media ${({ theme }) => theme.media.mobile} {
+      font-size: 15px;
+    }
+  }
+
+  p {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eaecef;
+    white-space: normal;
+    font-size: 16px;
+    margin-bottom: 20px;
+
+    @media ${({ theme }) => theme.media.mobile} {
+      font-size: 13px;
+    }
+  }
+  @media ${({ theme }) => theme.media.mobile} {
+    padding-right: 3px;
+    padding-left: 10px;
+    line-height: 1.2;
+  }
+`;
+
 const Data = styled.pre`
   color: ${(props) => props.dark && "#f5f6f7"};
   font-family: "Noto Sans KR", sans-serif;
@@ -107,33 +157,7 @@ const Data = styled.pre`
   line-height: 20px;
   padding-top: 30px;
   border-radius: 5px;
-  h5 {
-    font-size: 20px;
-    margin-bottom: 20px;
-    @media ${({ theme }) => theme.media.mobile} {
-      font-size: 16px;
-      padding-right: 3px;
-      padding-left: 10px;
-      width: min-content;
-      line-height: 1.2;
-    }
-  }
-  p {
-    width: 800px;
-    /* word-wrap: break-word; */
-    white-space: normal;
-    font-size: 16px;
-    margin: 20px 0px;
-    @media ${({ theme }) => theme.media.mobile} {
-      font-size: 13px;
-      padding-right: 3px;
-      padding-left: 10px;
-      width: 445px;
-      line-height: 1.2;
-    }
-  }
 `;
-
 const Button = styled.button`
   display: flex;
   align-items: center;
@@ -163,10 +187,12 @@ const Button = styled.button`
 const Content = styled.div`
   background-color: ${(props) => (props.dark ? "#242526" : "#f0f4f8")};
   color: ${(props) => props.dark && "#f5f6f7"};
-
   width: 100%;
   height: 100%;
   overflow: auto;
+  @media ${({ theme }) => theme.media.mobile} {
+    font-size: 13px;
+  }
 `;
 
 const Loading = styled.div`

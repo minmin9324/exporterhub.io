@@ -130,7 +130,7 @@ const AlertRuleCodeEditor = ({ alertInfo, handleMode }) => {
           id="codeEider"
           width="100%"
           height="100%"
-          placeholder="Placeholder Text"
+          placeholder="Enter code"
           mode="javascript"
           theme="github"
           name="blah2"
@@ -234,15 +234,17 @@ const FileName = styled.div`
   display: flex;
   align-items: center;
   font-size: 20px;
+
   p {
     padding-left: 7px;
   }
 `;
 
 const Input = styled.input`
+  margin: 5px 0px;
   @media ${({ theme }) => theme.media.mobile} {
     width: 100%;
-    margin: 0;
+    margin: 5px 0px;
   }
   width: ${(props) => (props.placeholder === "fileName" ? "400px" : "100%")};
   height: ${(props) => (props.as ? "" : "30px")};

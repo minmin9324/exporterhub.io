@@ -27,7 +27,7 @@ const ContentDetail = () => {
   const ACTIVECONTENT_OBJ = {
     0: <Exporter readmeContent={exporterInfo.readme} />,
     1: <Helm title={exporterInfo.title} />,
-    2: <Alert title={exporterInfo.title} />,
+    2: <Alert title={exporterInfo.title} type="_alert" />,
     3: <Dashboard title={exporterInfo.title} />,
   };
   const TOKEN = sessionStorage.getItem("access_token");
@@ -149,7 +149,7 @@ const Main = styled.main`
   padding: 90px 0 50px;
   background-color: ${(props) => (props.dark ? "#18191a" : "#f7f9fc")};
   @media ${({ theme }) => theme.media.mobile} {
-    padding: 90px 15px 50px;
+    padding: 60px 15px 50px;
   }
 `;
 const Container = styled.div`

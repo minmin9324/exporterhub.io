@@ -2,7 +2,8 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { GrEdit, GrFormAdd } from "react-icons/gr";
+import { TiPencil } from "react-icons/ti";
+import { FiPlus } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import DeleteModal from "../Modal/DeleteModal";
@@ -15,8 +16,8 @@ const List = ({
   select,
   isEditMode,
   setModify,
-  beforeEditting,
   handleMode,
+  mobile,
 }) => {
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
@@ -98,114 +99,124 @@ const List = ({
   };
 
   return (
-    <div>
-      <AlertList dark={changeTheme}>
-        <Title dark={changeTheme}>ALERTING RULE</Title>
-        {alertRuleCsvInfo === "default" ? (
-          <Loading>
-            <AiOutlineLoading3Quarters className="spinner" />
-          </Loading>
-        ) : (
-          <CategoryBox>
-            <div>
-              {alertRuleCsvInfo.length !== 0
-                ? alertRuleCsvInfo.map((alert) => {
-                    let github = alert.githubInfo.slice(
-                      alert.githubInfo.lastIndexOf("/") + 1,
-                      -5
-                    );
-                    return (
-                      <Category
-                        dark={changeTheme}
-                        isEditMode={isEditMode}
-                        key={alert.id}
+    <>
+      <Title dark={changeTheme}>
+        ALERTING RULE
+        {isEditMode && mobile && (
+          <Category
+            dark={changeTheme}
+            addIcon={true}
+            isEditMode={isEditMode}
+            onClick={handleSaveModal}
+          >
+            <FiPlus size={mobile ? "20px" : "30px"} />
+          </Category>
+        )}
+      </Title>
+      {alertRuleCsvInfo === "default" ? (
+        <Loading>
+          <AiOutlineLoading3Quarters className="spinner" />
+        </Loading>
+      ) : (
+        <CategoryBox>
+          <div>
+            {alertRuleCsvInfo.length !== 0
+              ? alertRuleCsvInfo.map((alert) => {
+                  let github = alert.githubInfo.slice(
+                    alert.githubInfo.lastIndexOf("/") + 1,
+                    -5
+                  );
+                  return (
+                    <Category
+                      active={alert.id === select}
+                      dark={changeTheme}
+                      isEditMode={isEditMode}
+                      key={alert.id}
+                      title={alert.githubInfo.slice(
+                        alert.githubInfo.lastIndexOf("/") + 1
+                      )}
+                    >
+                      <Div
                         active={alert.id === select}
-                        title={alert.githubInfo.slice(
-                          alert.githubInfo.lastIndexOf("/") + 1
-                        )}
+                        dark={changeTheme}
+                        fileName={isEditMode && alert.id === select}
+                        onClick={() => handleChangeAlertRule(alert.id)}
                       >
-                        <Div
-                          fileName={isEditMode && alert.id === select}
-                          onClick={() => handleChangeAlertRule(alert.id)}
-                        >
-                          {github}
-                        </Div>
+                        {github}
+                      </Div>
 
-                        {isEditMode && alert.id === select && (
-                          <EditBox>
-                            <GrEdit
-                              className="edit"
-                              onClick={() => setModify(true)}
-                            />
-                            <RiDeleteBin6Line
-                              className="edit"
-                              onClick={() => {
-                                setDeleteAlertRule(true);
-                              }}
-                            />
-                          </EditBox>
-                        )}
-                      </Category>
-                    );
-                  })
-                : select !== "New" && (
-                    <Category>
-                      <Div> "준비중" </Div>
+                      {isEditMode && alert.id === select && (
+                        <EditBox>
+                          <TiPencil
+                            className="edit"
+                            onClick={() => setModify(true)}
+                          />
+                          <RiDeleteBin6Line
+                            className="edit"
+                            onClick={() => {
+                              setDeleteAlertRule(true);
+                            }}
+                          />
+                        </EditBox>
+                      )}
                     </Category>
-                  )}
+                  );
+                })
+              : select !== "New" && (
+                  <Category>
+                    <Div dark={changeTheme}>"준비중"</Div>
+                  </Category>
+                )}
 
-              {isEditMode && select === "New" && (
-                <Category isEditMode={isEditMode} active={"New" === select}>
-                  <Div> New !</Div>
-                </Category>
-              )}
-            </div>
-            {isEditMode && (
+            {isEditMode && select === "New" && (
               <Category
-                addIcon={true}
+                dark={changeTheme}
                 isEditMode={isEditMode}
-                onClick={handleSaveModal}
+                active={"New" === select}
               >
-                <GrFormAdd size="30px" />
+                <Div active={"New" === select} dark={changeTheme}>
+                  New !
+                </Div>
               </Category>
             )}
-          </CategoryBox>
-        )}
-        {saveEdit && (
-          <DeleteModal
-            handleDelete={handleSave}
-            content="Don't you want to save the changes you made?"
-          ></DeleteModal>
-        )}
-        {deleteAlertRule && (
-          <DeleteModal
-            handleDelete={handleDelete}
-            content="삭제할거야 ?"
-          ></DeleteModal>
-        )}
-      </AlertList>
-    </div>
+          </div>
+          {isEditMode && !mobile && (
+            <Category
+              addIcon={true}
+              isEditMode={isEditMode}
+              onClick={handleSaveModal}
+            >
+              <FiPlus size={!mobile && "30px"} />
+            </Category>
+          )}
+        </CategoryBox>
+      )}
+      {saveEdit && (
+        <DeleteModal
+          handleDelete={handleSave}
+          content="Don't you want to save the changes you made?"
+        ></DeleteModal>
+      )}
+      {deleteAlertRule && (
+        <DeleteModal
+          handleDelete={handleDelete}
+          content="삭제할거야 ?"
+        ></DeleteModal>
+      )}
+    </>
   );
 };
 
-const AlertList = styled.ul`
-  width: 200px;
-  margin-top: 60px;
-  line-height: 1.5;
-  background-color: ${(props) => (props.dark ? "#242526" : "#ffffff")};
-  border-radius: 5px;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-  @media ${({ theme }) => theme.media.mobile} {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-`;
-
 const Title = styled.li`
+  display: flex;
   padding: 10px;
-  color: ${(props) => (props.dark ? "#f5f6f7" : "#999")};
+  color: ${({ dark }) => (dark ? "#f5f6f7" : "#999")};
+  @media ${({ theme }) => theme.media.mobile} {
+    display: flex;
+    font-size: 15px;
+    padding: 0px 3px 0px 10px;
+    color: ${({ dark }) => (dark ? "#f5f6f7" : "black")};
+  }
 `;
 
 const CategoryBox = styled.div`
@@ -213,6 +224,10 @@ const CategoryBox = styled.div`
   flex-direction: column;
   justify-content: space-between;
   min-height: 300px;
+  @media ${({ theme }) => theme.media.mobile} {
+    min-height: auto;
+    padding-bottom: 60px;
+  }
 `;
 
 const Category = styled.li`
@@ -220,21 +235,31 @@ const Category = styled.li`
   align-items: ${({ isEditMode }) => isEditMode && "center"};
   justify-content: ${({ isEditMode }) => isEditMode && "space-between"};
   display: flex;
-  justify-content: ${(props) => (props.addIcon ? "center" : "space-between;")};
+  justify-content: ${({ addIcon }) => addIcon && "center"};
+  margin-left: 0px;
   position: relative;
   background: ${({ active }) => active && "#eee"};
-  /* background: ${(props) => props.dark && "#303132"}; */
   cursor: pointer;
-  color: ${(props) => (props.dark ? "#f5f6f7" : "black")};
+  color: ${(props) => (props.dark ? "#f5f6f7" : "#999")};
   color: ${({ active }) => active && "black"};
+
+  @media ${({ theme }) => theme.media.mobile} {
+    justify-content: start;
+    margin-left: ${({ addIcon }) => (addIcon ? "5px" : "24px")};
+    background: transparent;
+  }
 
   &:hover {
     background: #eee;
+    @media ${({ theme }) => theme.media.mobile} {
+      background: transparent;
+    }
     color: black;
   }
+
   &:after {
     content: "";
-    display: ${({ active }) => (active ? "block" : "none")};
+    display: ${({ active }) => active && "block"};
     width: 13px;
     height: 10px;
     position: absolute;
@@ -246,21 +271,39 @@ const Category = styled.li`
         ? "url(/images/category_arrow.png) no-repeat center"
         : ""};
     background-size: 13px 10px;
+    @media ${({ theme }) => theme.media.mobile} {
+      display: none;
+    }
   }
 `;
+
 const Div = styled.div`
   flex: 8;
   padding: ${(props) =>
     props.fileName ? "3px 5px 3px 10px" : "3px 30px 3px 10px"};
   text-overflow: ellipsis;
   overflow: hidden;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    flex: none;
+    font-size: 13px;
+    padding: 0;
+    border-bottom: ${({ dark, active }) =>
+      active ? (dark ? "1px solid #f5f6f7" : "1px solid black") : ""};
+  }
 `;
+
 const EditBox = styled.div`
   display: flex;
   flex: 2;
   .edit {
-    margin-right: 5px;
+    margin-right: 3px;
     flex: 1;
+  }
+  @media ${({ theme }) => theme.media.mobile} {
+    flex: none;
+    font-size: 15px;
+    margin-left: 5px;
   }
 `;
 
@@ -268,6 +311,7 @@ const Loading = styled.div`
   text-align: center;
   font-size: 13px;
   margin-top: 20px;
+
   .spinner {
     animation: spin 2s linear infinite;
   }
