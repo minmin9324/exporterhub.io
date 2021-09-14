@@ -17,6 +17,7 @@ const Search = () => {
     </Div>
   );
 };
+
 const Div = styled.div`
   display: flex;
   align-items: center;
@@ -40,17 +41,18 @@ const Div = styled.div`
     }
   }
   input {
-    @media ${({ theme }) => theme.media.mobile} {
-      width: 100%;
-      margin: 0;
-    }
     width: 300px;
     height: 40px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: ${(props) =>
+      props.dark ? "1px solid white" : "1px solid rgba(0, 0, 0, 0.2)"};
     border-radius: 4px;
     padding-left: 35px;
     background-color: ${(props) => (props.dark ? "#18191a" : "#ffffff")};
     color: ${(props) => (props.dark ? "#ffffff" : "#black")};
+    @media ${({ theme }) => theme.media.mobile} {
+      width: 100%;
+      margin: 0;
+    }
   }
 `;
 export default Search;
