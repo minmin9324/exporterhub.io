@@ -26,7 +26,11 @@ const AlertRuleCodeEditor = ({ alertInfo, handleMode }) => {
     dispatch(
       beforeEdittingAlertRule(
         alertInfo === ""
-          ? {}
+          ? {
+              fileName: "",
+              description: "",
+              content: "",
+            }
           : {
               fileName: alertInfo[0].githubInfo.slice(
                 alertInfo[0].githubInfo.lastIndexOf("/") + 1,
@@ -117,14 +121,6 @@ const AlertRuleCodeEditor = ({ alertInfo, handleMode }) => {
             dark={changeTheme}
             onChange={handleFileInfo}
           />
-          {/* <Input
-            id="description"
-            value={fileInfo.description}
-            type="text"
-            placeholder="description"
-            dark={changeTheme}
-            onChange={handleFileInfo}
-          /> */}
         </Inputbox>
         <AceEditor
           id="codeEider"
