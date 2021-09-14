@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 // import axios from "axios";
-import AlertRuleDataviewer from "./AlertRuleDataviewer";
+import ExporterTabDataviewer from "./ExporterTabDataviewer";
 import { useSelector } from "react-redux";
-
 // import { useParams } from "react-router";
 // import { API_SURVER } from "../../../config";
-import AlertRuleList from "../../Sider/AlertRuleList";
+import ExporterDetailTabList from "../../Sider/ExporterDetailTabList";
 
-const Alert = ({ title }) => {
+const ExporterTab = ({ title, type }) => {
   // const { id } = useParams();
   const changeTheme = useSelector((store) => store.darkThemeReducer);
-  const [alertRuleCsv, setAlertRuleCsv] = useState("default");
+  // const [mdSha, setMdSha] = useState();
+  // const [codeSha, setCodeSha] = useState();
+  const [exporterCsv, setExporterCsv] = useState("default");
   const [isEditMode, setIsEditMode] = useState(false);
   const [modify, setModify] = useState(false);
   const [select, setSelect] = useState(0);
@@ -21,6 +22,7 @@ const Alert = ({ title }) => {
     if (isEditMode) {
       setModify(false);
     }
+    getData();
   };
 
   useEffect(() => {
@@ -33,12 +35,12 @@ const Alert = ({ title }) => {
 
     // axios({
     //   method: "GET",
-    //   url: `${API_SURVER}/exporter/${id}/tab?type=alert`,
+    //   url: `${API_SURVER}/exporter/${id}/tab?type={type}`,
     //   headers: HEADER,
     // })
     //   .then((res) => {
     //     console.log(res);
-    //     setalertRuleCsv(
+    //     setExporterCsv(
     //       res.data.md_content === null ? "N/A" : res.data.md_content
     //     );
     // setMdSha(res.data.md_sha);
@@ -47,54 +49,55 @@ const Alert = ({ title }) => {
     //   .catch((err) => {
     //     console.log(err);
     //   });
-    setAlertRuleCsv(alertRule);
+
+    setExporterCsv(alertRule === null ? [] : alertRule);
     alertRule.length !== 0 ? setSelect(alertRule[0].id) : setSelect(0);
   };
 
   return (
     <Div>
       <div>
-        <AlertList dark={changeTheme}>
-          <AlertRuleList
+        <TabListbox dark={changeTheme}>
+          <ExporterDetailTabList
             modify={modify}
-            alertRuleCsvInfo={alertRuleCsv}
+            exporterCsv={exporterCsv}
             setSelect={setSelect}
             select={select}
             isEditMode={isEditMode}
             setModify={setModify}
             handleMode={handleMode}
           />
-        </AlertList>
+        </TabListbox>
       </div>
       <Container>
         <div>
-          <MobileList dark={changeTheme}>
-            <AlertRuleList
+          <MobileTabListbox dark={changeTheme}>
+            <ExporterDetailTabList
               mobile={true}
               modify={modify}
-              alertRuleCsvInfo={alertRuleCsv}
+              exporterCsv={exporterCsv}
               setSelect={setSelect}
               select={select}
               isEditMode={isEditMode}
               setModify={setModify}
               handleMode={handleMode}
             />
-          </MobileList>
+          </MobileTabListbox>
         </div>
-        <AlertRuleDataviewer
+        <ExporterTabDataviewer
           select={select}
           isEditMode={isEditMode}
           modify={modify}
           handleMode={handleMode}
           title={title}
-          type="_alert"
-          alertRuleCsvInfo={alertRuleCsv}
-        ></AlertRuleDataviewer>
+          type={type}
+          exporterCsv={exporterCsv}
+        ></ExporterTabDataviewer>
       </Container>
     </Div>
   );
 };
-export default Alert;
+export default ExporterTab;
 
 const Div = styled.div`
   ${({ theme }) => theme.container};
@@ -105,7 +108,7 @@ const Div = styled.div`
   }
 `;
 
-const AlertList = styled.ul`
+const TabListbox = styled.ul`
   width: 200px;
   margin-top: 60px;
   line-height: 1.5;
@@ -120,7 +123,7 @@ const AlertList = styled.ul`
   }
 `;
 
-const MobileList = styled.ul`
+const MobileTabListbox = styled.ul`
   display: none;
   line-height: 1.5;
   @media ${({ theme }) => theme.media.mobile} {

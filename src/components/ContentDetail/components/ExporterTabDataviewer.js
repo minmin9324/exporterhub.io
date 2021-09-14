@@ -2,29 +2,39 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { FiEdit } from "react-icons/fi";
 import { BiUndo } from "react-icons/bi";
-import AlertRuleCodeEditor from "./AlertRuleCodeEditor2";
+import ExporterTabCodeEditor from "./ExporterTabCodeEditor";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import NoData from "./NoData";
 import { Fragment } from "react";
-const AlertRuleDataviewer = ({
+const ExporterTabDataviewer = ({
   modify,
   handleMode,
   title,
   type,
   isEditMode,
-  alertRuleCsvInfo,
+  exporterCsv,
   select,
 }) => {
   const isAdmin = useSelector((store) => store.adminReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
-  const emty =
-    alertRuleCsvInfo !== "default" ? alertRuleCsvInfo.length === 0 : false;
-
-  const alertInfo =
-    select !== "New" &&
-    alertRuleCsvInfo !== "default" &&
-    alertRuleCsvInfo.length !== 0
-      ? alertRuleCsvInfo.filter((alert) => alert.id === select)
+  const emty = exporterCsv !== "default" ? exporterCsv.length === 0 : false;
+  const selectFileInfo =
+    select !== "New" && exporterCsv !== "default" && exporterCsv.length !== 0
+      ? exporterCsv.filter((file) => file.id === select)
+      : "";
+  const fileName =
+    emty === false && selectFileInfo !== ""
+      ? selectFileInfo[0].githubInfo.slice(
+          selectFileInfo[0].githubInfo.lastIndexOf("/") + 1
+        )
+      : "";
+  const fileDescription =
+    emty === false && selectFileInfo !== ""
+      ? selectFileInfo[0].description
+      : "";
+  const fileContent =
+    emty === false && selectFileInfo !== ""
+      ? selectFileInfo[0].yamlContent
       : "";
 
   return (
@@ -48,27 +58,21 @@ const AlertRuleDataviewer = ({
       <div>
         {!modify ? (
           <Data dark={changeTheme}>
-            {alertRuleCsvInfo === "default" ? (
+            {exporterCsv === "default" ? (
               <Loading>
                 <AiOutlineLoading3Quarters className="spinner" />
               </Loading>
             ) : (
               <Fragment>
-                {emty === false && alertInfo !== "" ? (
-                  <AlertContainer>
-                    <h1>
-                      {alertInfo[0].githubInfo.slice(
-                        alertInfo[0].githubInfo.lastIndexOf("/") + 1
-                      )}
-                    </h1>
+                {emty === false && selectFileInfo !== "" ? (
+                  <ExporterContainer>
+                    <h1>{fileName}</h1>
                     <div>
                       <h3>Description</h3>
-                      <p>{alertInfo[0].description}</p>
+                      <p>{fileDescription}</p>
                     </div>
-                    <Content dark={changeTheme}>
-                      {alertInfo[0].yamlContent}
-                    </Content>
-                  </AlertContainer>
+                    <Content dark={changeTheme}>{fileContent}</Content>
+                  </ExporterContainer>
                 ) : (
                   <NoData mdSha={!emty} />
                 )}
@@ -76,13 +80,19 @@ const AlertRuleDataviewer = ({
             )}
           </Data>
         ) : (
-          <AlertRuleCodeEditor alertInfo={alertInfo} handleMode={handleMode} />
+          <ExporterTabCodeEditor
+            type={type}
+            fileName={fileName}
+            fileDescription={fileDescription}
+            fileContent={fileContent}
+            handleMode={handleMode}
+          />
         )}
       </div>
     </>
   );
 };
-export default AlertRuleDataviewer;
+export default ExporterTabDataviewer;
 
 const Header = styled.header`
   display: flex;
@@ -95,6 +105,7 @@ const ContentTitle = styled.h1`
   font-weight: 500;
   color: ${(props) => props.dark && "#f5f6f7"};
   letter-spacing: 0.08rem;
+  font-size: 25px;
 
   @media ${({ theme }) => theme.media.mobile} {
     font-size: 18px;
@@ -106,7 +117,7 @@ const ContentTitle = styled.h1`
   color: ${(props) => props.dark && "#f5f6f7"}; ;
 `;
 
-const AlertContainer = styled.div`
+const ExporterContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -116,7 +127,6 @@ const AlertContainer = styled.div`
     margin-bottom: 10px;
     padding-bottom: 0.5em;
     border-bottom: 1px solid #eaecef;
-    font-size: 25px;
 
     letter-spacing: 0.08rem;
     @media ${({ theme }) => theme.media.mobile} {

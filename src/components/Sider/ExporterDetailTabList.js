@@ -9,9 +9,9 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import DeleteModal from "../Modal/DeleteModal";
 import { set } from "js-cookie";
 
-const List = ({
+const ExporterDetailTabList = ({
   modify,
-  alertRuleCsvInfo,
+  exporterCsv,
   setSelect,
   select,
   isEditMode,
@@ -20,22 +20,20 @@ const List = ({
   mobile,
 }) => {
   const changeTheme = useSelector((store) => store.darkThemeReducer);
-  const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
-  const beforeEditAlert = useSelector(
+  const edittingFile = useSelector((store) => store.alertRuleEdittingReducer);
+  const beforeEditFile = useSelector(
     (store) => store.alertRuleBeforeEditReducer
   );
-
   const [saveEdit, setSaveEdit] = useState(false);
   const [moveId, setMoveId] = useState(false);
-  const [deleteAlertRule, setDeleteAlertRule] = useState(false);
+  const [deleteFile, setDeleteFile] = useState(false);
   const dontSaved =
-    modify && JSON.stringify(edittingAlert) !== JSON.stringify(beforeEditAlert);
-  console.log(JSON.stringify(edittingAlert));
-  console.log(JSON.stringify(beforeEditAlert));
-  const handleAddAlertRule = () => {
-    if (alertRuleCsvInfo.length !== 0) {
+    modify && JSON.stringify(edittingFile) !== JSON.stringify(beforeEditFile);
+
+  const handleFileAdd = () => {
+    if (exporterCsv.length !== 0) {
       if (select === "New") {
-        setSelect(alertRuleCsvInfo[0].id);
+        setSelect(exporterCsv[0].id);
         setModify(false);
       } else {
         setSelect("New");
@@ -57,20 +55,19 @@ const List = ({
       setSaveEdit(true);
       setMoveId("New");
     } else {
-      handleAddAlertRule();
+      handleFileAdd();
     }
   };
 
   const handleSave = (answer) => {
     if (answer === "Yes") {
       if (moveId === "New") {
-        handleAddAlertRule();
+        handleFileAdd();
       } else {
         setSelect(moveId);
         setModify(false);
       }
     }
-
     setSaveEdit(false);
   };
 
@@ -79,21 +76,19 @@ const List = ({
       console.log(select, "을 삭제해");
       //response 오면 실행
       handleMode();
-      alertRuleCsvInfo.length !== 0
-        ? setSelect(alertRuleCsvInfo[0].id)
-        : setSelect(0);
-      setDeleteAlertRule(false);
+      exporterCsv.length !== 0 ? setSelect(exporterCsv[0].id) : setSelect(0);
+      setDeleteFile(false);
     } else {
-      setDeleteAlertRule(false);
+      setDeleteFile(false);
     }
   };
 
-  const handleChangeAlertRule = (alertRuleId) => {
+  const handleChangeFile = (fileId) => {
     if (dontSaved) {
-      setMoveId(alertRuleId);
+      setMoveId(fileId);
       setSaveEdit(true);
     } else {
-      setSelect(alertRuleId);
+      setSelect(fileId);
       setModify(false);
     }
   };
@@ -113,39 +108,39 @@ const List = ({
           </Category>
         )}
       </Title>
-      {alertRuleCsvInfo === "default" ? (
+      {exporterCsv === "default" ? (
         <Loading>
           <AiOutlineLoading3Quarters className="spinner" />
         </Loading>
       ) : (
         <CategoryBox>
           <div>
-            {alertRuleCsvInfo.length !== 0
-              ? alertRuleCsvInfo.map((alert) => {
-                  let github = alert.githubInfo.slice(
-                    alert.githubInfo.lastIndexOf("/") + 1,
+            {exporterCsv.length !== 0
+              ? exporterCsv.map((file) => {
+                  let github = file.githubInfo.slice(
+                    file.githubInfo.lastIndexOf("/") + 1,
                     -5
                   );
                   return (
                     <Category
-                      active={alert.id === select}
+                      active={file.id === select}
                       dark={changeTheme}
                       isEditMode={isEditMode}
-                      key={alert.id}
-                      title={alert.githubInfo.slice(
-                        alert.githubInfo.lastIndexOf("/") + 1
+                      key={file.id}
+                      title={file.githubInfo.slice(
+                        file.githubInfo.lastIndexOf("/") + 1
                       )}
                     >
                       <Div
-                        active={alert.id === select}
+                        active={file.id === select}
                         dark={changeTheme}
-                        fileName={isEditMode && alert.id === select}
-                        onClick={() => handleChangeAlertRule(alert.id)}
+                        fileName={isEditMode && file.id === select}
+                        onClick={() => handleChangeFile(file.id)}
                       >
                         {github}
                       </Div>
 
-                      {isEditMode && alert.id === select && (
+                      {isEditMode && file.id === select && (
                         <EditBox>
                           <TiPencil
                             className="edit"
@@ -154,7 +149,7 @@ const List = ({
                           <RiDeleteBin6Line
                             className="edit"
                             onClick={() => {
-                              setDeleteAlertRule(true);
+                              setDeleteFile(true);
                             }}
                           />
                         </EditBox>
@@ -197,7 +192,7 @@ const List = ({
           content="Don't you want to save the changes you made?"
         ></DeleteModal>
       )}
-      {deleteAlertRule && (
+      {deleteFile && (
         <DeleteModal
           handleDelete={handleDelete}
           content="삭제할거야 ?"
@@ -206,6 +201,7 @@ const List = ({
     </>
   );
 };
+export default ExporterDetailTabList;
 
 const Title = styled.li`
   display: flex;
@@ -246,15 +242,17 @@ const Category = styled.li`
   @media ${({ theme }) => theme.media.mobile} {
     justify-content: start;
     margin-left: ${({ addIcon }) => (addIcon ? "5px" : "24px")};
+    color: ${(props) => (props.dark ? "#f5f6f7" : "#black")};
     background: transparent;
   }
 
   &:hover {
     background: #eee;
+    color: black;
     @media ${({ theme }) => theme.media.mobile} {
       background: transparent;
+      color: ${(props) => (props.dark ? "#f5f6f7" : "#black")};
     }
-    color: black;
   }
 
   &:after {
@@ -324,4 +322,3 @@ const Loading = styled.div`
     }
   }
 `;
-export default List;
