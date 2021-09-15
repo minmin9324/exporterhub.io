@@ -30,9 +30,11 @@ const Contetnt = () => {
       params: { type: navFilter, category: cateFilter, sort: sortFilter },
     })
       .then((res) => {
+        console.log(res);
         let resultExporters = res.data.exporters.filter((exporter) => {
           return exporter.name.toLowerCase().includes(searchFilter);
         });
+
         dispatch(allData(resultExporters));
       })
       .catch((err) => console.log(err));
@@ -63,9 +65,9 @@ const Contetnt = () => {
 };
 const Section = styled.section`
   width: ${({ theme }) => theme.width.content}px;
-
   @media ${({ theme }) => theme.media.mobile} {
     /* width: ${({ theme }) => theme.width.contentOnM}%; */
+    min-height: 90vh;
     width: 100%;
     margin: 0 auto;
     padding: 0 20px;

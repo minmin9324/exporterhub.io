@@ -4,9 +4,7 @@ import useLocalStorage from "react-use-localstorage";
 import axios from "axios";
 import styled from "styled-components";
 import Exporter from "./components/Exporter";
-import Dashboard from "./components/Dashboard";
-import Alert from "./components/Alert";
-import Helm from "./components/Helm";
+import ExporterTab from "./components/ExporterTab";
 import { EXPORTER_API } from "../../config";
 import OpenSourceInfo from "./components/OpenSourceInfo";
 import { useSelector } from "react-redux";
@@ -26,15 +24,17 @@ const ContentDetail = () => {
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const ACTIVECONTENT_OBJ = {
     0: <Exporter readmeContent={exporterInfo.readme} />,
-    1: <Helm title={exporterInfo.title} />,
-    2: <Alert title={exporterInfo.title} />,
-    3: <Dashboard title={exporterInfo.title} />,
+    1: <ExporterTab title={exporterInfo.title} type="_helm.yaml" />,
+    2: <ExporterTab title={exporterInfo.title} type="_alert.yaml" />,
+    3: <ExporterTab title={exporterInfo.title} type="_dashboard.json" />,
   };
+
   const TOKEN = sessionStorage.getItem("access_token");
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchData();
   }, []);
+
   useEffect(() => {
     fetchData();
   }, [forkState]);
@@ -149,7 +149,7 @@ const Main = styled.main`
   padding: 90px 0 50px;
   background-color: ${(props) => (props.dark ? "#18191a" : "#f7f9fc")};
   @media ${({ theme }) => theme.media.mobile} {
-    padding: 90px 15px 50px;
+    padding: 60px 15px 50px;
   }
 `;
 const Container = styled.div`

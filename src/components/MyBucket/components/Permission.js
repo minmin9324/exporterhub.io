@@ -77,8 +77,11 @@ const Permission = () => {
       })
         .then((res) => {
           showAlertModal();
+          setIsAdminAddModalActive(false);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -310,3 +313,26 @@ const AlertModal = styled.div`
     }
   }
 `;
+
+const admminData = [
+  {
+    username: "minmin9324",
+    usertype: "Admin",
+    profileImageUrl: "https://avatars.githubusercontent.com/u/78531190?v=4",
+  },
+  {
+    username: "mango",
+    usertype: "user",
+    profileImageUrl: "https://avatars.githubusercontent.com/u/78531190?v=4",
+  },
+  {
+    username: "jungmin",
+    usertype: "user",
+    profileImageUrl: "https://avatars.githubusercontent.com/u/78531190?v=4",
+  },
+  {
+    profileImageUrl: "https://avatars.githubusercontent.com/u/90562434?v=4",
+    username: "jeckzin",
+    usertype: "user",
+  },
+];
