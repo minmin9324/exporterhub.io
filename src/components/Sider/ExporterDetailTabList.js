@@ -33,7 +33,7 @@ const ExporterDetailTabList = ({
   const handleFileAdd = () => {
     if (exporterCsv.length !== 0) {
       if (select === "New") {
-        setSelect(exporterCsv[0].id);
+        setSelect(exporterCsv[0].file_id);
         setModify(false);
       } else {
         setSelect("New");
@@ -76,7 +76,9 @@ const ExporterDetailTabList = ({
       console.log(select, "을 삭제해");
       //response 오면 실행
       handleMode();
-      exporterCsv.length !== 0 ? setSelect(exporterCsv[0].id) : setSelect(0);
+      exporterCsv.length !== 0
+        ? setSelect(exporterCsv[0].file_id)
+        : setSelect(0);
       setDeleteFile(false);
     } else {
       setDeleteFile(false);
@@ -117,30 +119,30 @@ const ExporterDetailTabList = ({
           <div>
             {exporterCsv.length !== 0
               ? exporterCsv.map((file) => {
-                  let github = file.githubInfo.slice(
-                    file.githubInfo.lastIndexOf("/") + 1,
-                    -5
+                  let github = file.file_url.slice(
+                    file.file_url.lastIndexOf("/") + 1,
+                    file.file_url.lastIndexOf("_")
                   );
                   return (
                     <Category
-                      active={file.id === select}
+                      active={file.file_id === select}
                       dark={changeTheme}
                       isEditMode={isEditMode}
-                      key={file.id}
-                      title={file.githubInfo.slice(
-                        file.githubInfo.lastIndexOf("/") + 1
+                      key={file.file_id}
+                      title={file.file_url.slice(
+                        file.file_url.lastIndexOf("/") + 1
                       )}
                     >
                       <Div
-                        active={file.id === select}
+                        active={file.file_id === select}
                         dark={changeTheme}
-                        fileName={isEditMode && file.id === select}
-                        onClick={() => handleChangeFile(file.id)}
+                        fileName={isEditMode && file.file_id === select}
+                        onClick={() => handleChangeFile(file.file_id)}
                       >
                         {github}
                       </Div>
 
-                      {isEditMode && file.id === select && (
+                      {isEditMode && file.file_id === select && (
                         <EditBox>
                           <TiPencil
                             className="edit"

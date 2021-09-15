@@ -20,23 +20,17 @@ const ExporterTabDataviewer = ({
   const emty = exporterCsv !== "default" ? exporterCsv.length === 0 : false;
   const selectFileInfo =
     select !== "New" && exporterCsv !== "default" && exporterCsv.length !== 0
-      ? exporterCsv.filter((file) => file.id === select)
-      : "";
-  const fileName =
-    emty === false && selectFileInfo !== ""
-      ? selectFileInfo[0].githubInfo.slice(
-          selectFileInfo[0].githubInfo.lastIndexOf("/") + 1
-        )
-      : "";
-  const fileDescription =
-    emty === false && selectFileInfo !== ""
-      ? selectFileInfo[0].description
-      : "";
-  const fileContent =
-    emty === false && selectFileInfo !== ""
-      ? selectFileInfo[0].yamlContent
-      : "";
-
+      ? exporterCsv.filter((file) => file.file_id === select)
+      : [
+          {
+            file_content: "",
+            file_url: "",
+            file_sha: "",
+            csv_sha: "",
+            file_id: "",
+            csv_desc: "",
+          },
+        ];
   return (
     <>
       <Header>
@@ -64,14 +58,20 @@ const ExporterTabDataviewer = ({
               </Loading>
             ) : (
               <Fragment>
-                {emty === false && selectFileInfo !== "" ? (
+                {emty === false && selectFileInfo[0].file_content !== "" ? (
                   <ExporterContainer>
-                    <h1>{fileName}</h1>
+                    <h1>
+                      {selectFileInfo[0].file_url.slice(
+                        selectFileInfo[0].file_url.lastIndexOf("/") + 1
+                      )}
+                    </h1>
                     <div>
                       <h3>Description</h3>
-                      <p>{fileDescription}</p>
+                      <p>{selectFileInfo[0].csv_desc}</p>
                     </div>
-                    <Content dark={changeTheme}>{fileContent}</Content>
+                    <Content dark={changeTheme}>
+                      {selectFileInfo[0].file_content}
+                    </Content>
                   </ExporterContainer>
                 ) : (
                   <NoData mdSha={!emty} />
@@ -82,9 +82,13 @@ const ExporterTabDataviewer = ({
         ) : (
           <ExporterTabCodeEditor
             type={type}
-            fileName={fileName}
-            fileDescription={fileDescription}
-            fileContent={fileContent}
+            fileName={selectFileInfo[0].file_url.slice(
+              selectFileInfo[0].file_url.lastIndexOf("/") + 1
+            )}
+            fileDescription={selectFileInfo[0].csv_desc}
+            fileContent={selectFileInfo[0].file_content}
+            fileSha={selectFileInfo[0].file_sha}
+            csvSha={selectFileInfo[0].csv_sha}
             handleMode={handleMode}
           />
         )}

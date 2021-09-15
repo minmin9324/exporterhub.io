@@ -50,8 +50,10 @@ const ExporterTab = ({ title, type }) => {
     //     console.log(err);
     //   });
 
-    setExporterCsv(alertRule === null ? [] : alertRule);
-    alertRule.length !== 0 ? setSelect(alertRule[0].id) : setSelect(0);
+    setExporterCsv(data.message === [] ? [] : data.message);
+    data.message.length !== 0
+      ? setSelect(data.message[0].file_id)
+      : setSelect(0);
   };
 
   return (
@@ -137,50 +139,96 @@ const Container = styled.div`
   width: 800px;
 `;
 
-const alertRule = [
-  {
-    id: 3,
-    description:
-      "Node memory is filling up (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
-    yamlContent: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
-                for: 2m
-                labels:
+const data = {
+  message: [
+    {
+      file_content: "mango_is_happy",
+      file_url:
+        "https://api.github.com/repos/Exporterhubv4/exporterhub.io/contents/contents/OpenStack/OpenStack_alert/Openstack_test1_alert.yaml",
+      file_sha: "47b22a2a469a4fe164c2ae62c2413c09586a21b0",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "01",
+      csv_desc: "teasdfasdfasdfsdafdfsadf",
+    },
+    {
+      file_content: "need change",
+      file_url:
+        "https://api.github.com/repos/Exporterhubv4/exporterhub.io/contents/contents/OpenStack/OpenStack_alert/Openstack_test_alert.yaml",
+      file_sha: "5335d5f2a06b228a8ec89b52f5e7981d8eb3d3f2",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "02",
+      csv_desc: "mango",
+    },
+    {
+      file_content: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+                 for: 2m
+                 labels:
                   severity: warning
                 annotations:
-                  summary: Host out of memory (instance {{ $labels.instance }})
+                   summary: Host out of memory (instance {{ $labels.instance }})
                   description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}
-            "`,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
-  },
-  {
-    id: 5,
-    description:
-      "Host network interfaces are probably sending too much data  (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
-    yamlContent: ` expr: sum by (instance) (rate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: Host unusual network throughput out (instance {{ $labels.instance }})
-                  description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-            `,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostMemoryUnderMemoryPressure.yaml",
-  },
-  {
-    id: 6,
-    description:
-      "Host network interfaces are probably receiving too much data ",
-    yamlContent: ` expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: Host unusual network throughput in (instance {{ $labels.instance }})
-                  description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-            `,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostUnusualNetworkThroughputIn.yaml",
-  },
-];
+             "`,
+      file_url:
+        "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
+      file_sha: "5335d5f2a06b228a8ec89b52f5e7981d8eb3d3f2",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "03",
+      csv_desc: "Host network interfaces are probably sending too much data",
+    },
+  ],
+};
+
+// yaml_content,
+//       yaml_url,
+//       yaml_sha,
+//       csv_sha,
+//       yaml_id,
+//       csv_desc,
+
+// const alertRule = [
+//   {
+//     id: 3,
+//     description:
+//       "Node memory is filling up (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
+//     yamlContent: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+//                 for: 2m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host out of memory (instance {{ $labels.instance }})
+//                   description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}
+//             "`,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
+//   },
+//   {
+//     id: 5,
+//     description:
+//       "Host network interfaces are probably sending too much data  (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
+//     yamlContent: ` expr: sum by (instance) (rate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
+//                 for: 5m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host unusual network throughput out (instance {{ $labels.instance }})
+//                   description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+//             `,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostMemoryUnderMemoryPressure.yaml",
+//   },
+//   {
+//     id: 6,
+//     description:
+//       "Host network interfaces are probably receiving too much data ",
+//     yamlContent: ` expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
+//                 for: 5m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host unusual network throughput in (instance {{ $labels.instance }})
+//                   description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+//             `,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostUnusualNetworkThroughputIn.yaml",
+//   },
+// ];

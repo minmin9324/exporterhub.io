@@ -3,22 +3,54 @@ import styled from "styled-components";
 import { useState } from "react";
 import axios from "axios";
 import { FiArrowDown } from "react-icons/fi";
-import { CATEGORIES_API } from "../../config";
+import { CATEGORIES_API, EXPORTERS_API } from "../../config";
 import DeleteModal from "./DeleteModal";
+import { useDispatch } from "react-redux";
+import {
+  loadCategoriesData,
+  allData,
+} from "../../store/actions/exporterActions";
 
 const CategoryDeleteModal = ({
+  setCategoryAct,
   deletecategoryName,
   deletecategoryId,
   categoriesList,
   setDeletecategory,
   ismobile = false,
 }) => {
+  const dispatch = useDispatch();
+
   const [sureDelete, setSureDelete] = useState(false);
   const [selectCategory, setSelectCategory] = useState("Select category");
   const [isSelected, setIsSelected] = useState(true);
   const cata = categoriesList.filter(
     (ele) => ele.category_id !== deletecategoryId
   );
+
+  const getCategory = () => {
+    axios({
+      method: "GET",
+      url: `${CATEGORIES_API}`,
+    })
+      .then((res) => {
+        dispatch(loadCategoriesData(res.data.categories));
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const mainFilter = () => {
+    axios({
+      method: "GET",
+      url: `${EXPORTERS_API}`,
+      params: { type: "", category: "", sort: "popular" },
+    })
+      .then((res) => {
+        dispatch(allData(res.data.exporters));
+      })
+      .catch((err) => console.log(err));
+  };
+
   const handleDelete = (answer) => {
     if (answer === "Yes") {
       setSureDelete(true);
@@ -45,8 +77,10 @@ const CategoryDeleteModal = ({
           Authorization: sessionStorage.getItem("access_token"),
         },
       })
-        .then(() => {
-          window.location.reload();
+        .then((res) => {
+          mainFilter();
+          getCategory();
+          setCategoryAct(0);
           setDeletecategory(false);
         })
         .catch((error) => console.log(error));
@@ -58,8 +92,11 @@ const CategoryDeleteModal = ({
           Authorization: sessionStorage.getItem("access_token"),
         },
       })
-        .then(() => {
-          window.location.reload();
+        .then((res) => {
+          // window.location.reload();
+          mainFilter();
+          getCategory();
+          setCategoryAct(0);
           setDeletecategory(false);
         })
         .catch((error) => {

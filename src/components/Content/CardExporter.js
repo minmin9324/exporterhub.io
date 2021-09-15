@@ -38,7 +38,6 @@ const CardExporter = ({
   };
   const deleteExporter = (answer) => {
     if (answer === "Yes") {
-      console.log("dldk", exporter_id);
       axios({
         method: "delete",
         url: `${EXPORTER_API}/exporter?exporter_id=${exporter_id}`,
@@ -49,7 +48,6 @@ const CardExporter = ({
         .then((res) => {
           window.location.reload();
           setDeleteModal(false);
-          console.log(res);
         })
         .catch((error) => {
           // setFailMessage(error.response?.data.message);

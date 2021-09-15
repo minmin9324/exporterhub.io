@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { loadCategoriesData } from "../../store/actions/exporterActions";
 import axios from "axios";
 import styled from "styled-components";
 import { EXPORTER_ADMIN_API } from "../../config";
@@ -13,12 +14,8 @@ const RegisterModal = ({ cancleModal }) => {
   const [category, setCategory] = useState("Select category");
   const [failMessage, setFailMessage] = useState("");
   const [pluscategory, setPluscategory] = useState(false);
-  const [categoriesList, setCategoriesList] = useState([]);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    setCategoriesList(categories);
-  }, []);
-  console.log(category);
   const registerExporter = () => {
     if (exporterTitle.length === 0) {
       setFailMessage("WRONG_EXPORTER_TITLE");
@@ -47,6 +44,17 @@ const RegisterModal = ({ cancleModal }) => {
       });
   };
 
+  const getCategory = () => {
+    axios({
+      method: "GET",
+      url: `${CATEGORIES_API}`,
+    })
+      .then((res) => {
+        dispatch(loadCategoriesData(res.data.categories));
+      })
+      .catch((err) => console.log(err));
+  };
+
   const inputExporterTitle = (e) => {
     setExporterTitle(e.target.value);
   };
@@ -57,6 +65,7 @@ const RegisterModal = ({ cancleModal }) => {
 
   const selectCategory = (e) => {
     if (e.target.value === "+ New category") {
+      setCategory(e.target.value);
       setPluscategory(true);
     } else {
       setPluscategory(false);
@@ -69,32 +78,35 @@ const RegisterModal = ({ cancleModal }) => {
     if (pluscategory === true) {
       setFailMessage("write category name");
       return;
+    } else {
+      const isSame = categories.filter(
+        (category) =>
+          category.category_name.toLowerCase() === pluscategory.toLowerCase()
+      );
+      if (isSame.length === 0) {
+        axios({
+          method: "post",
+          url: `${CATEGORIES_API}`,
+          data: {
+            category: pluscategory,
+          },
+          headers: {
+            Authorization: sessionStorage.getItem("access_token"),
+          },
+        })
+          .then(() => {
+            getCategory();
+            setPluscategory(false);
+            setFailMessage("");
+            setCategory("Select category");
+            setExporterTitle("");
+            setRepoUrl("");
+          })
+          .catch((error) => {});
+      } else {
+        setFailMessage("This name already exists.");
+      }
     }
-    const list = categoriesList.concat({
-      category_id: pluscategory,
-      category_name: pluscategory,
-    });
-    setCategoriesList(list);
-
-    axios({
-      method: "post",
-      url: `${CATEGORIES_API}`,
-      data: {
-        category: pluscategory,
-      },
-      headers: {
-        Authorization: sessionStorage.getItem("access_token"),
-      },
-    })
-      .then(() => {
-        setPluscategory(false);
-        setFailMessage("");
-        setCategory("Select category");
-        setExporterTitle("");
-        setRepoUrl("");
-      })
-      .catch((error) => {
-      });
   };
 
   return (
@@ -103,9 +115,13 @@ const RegisterModal = ({ cancleModal }) => {
         <img src="assets/image.png" alt="modal" />
         <Container>
           <div>{failMessage}</div>
-          <select className="inputDiv" onChange={selectCategory}>
+          <select
+            className="inputDiv"
+            value={category}
+            onChange={selectCategory}
+          >
             <option>Select category</option>
-            {categoriesList.map((category) => {
+            {categories.map((category) => {
               return (
                 <option key={category.category_id}>
                   {category.category_name}

@@ -7,11 +7,13 @@ import DeleteModal from "../Modal/DeleteModal";
 import {
   filterBySort,
   filterByCate,
+  loadCategoriesData,
 } from "../../store/actions/exporterActions";
 import { CATEGORIES_API } from "../../config";
 import Search from "../Header/Search";
 import RegisterModal from "../Modal/RegisterModal";
 import CategoryDeleteModal from "../Modal/CategoryDeleteModal";
+
 const ContentMenu = ({ totaCount }) => {
   const dispatch = useDispatch();
   const [isModalActive, setIsModalActive] = useState(false);
@@ -19,20 +21,31 @@ const ContentMenu = ({ totaCount }) => {
   const [deletecategory, setDeletecategory] = useState(false);
   const [alert, setAlert] = useState(false);
   const [plusOrDelete, setPlusOrDelete] = useState("");
-  const [editSelectCategory, setEditSelectCategory] = useState("");
+  const [editSelectCategory, setEditSelectCategory] = useState(0);
   const [addCategoryName, setAddCategoryName] = useState("");
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const isAdmin = useSelector((store) => store.adminReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
+  const categories = useSelector((store) => store.categoryReducer);
 
-  useEffect(() => {
-    axios.get(CATEGORIES_API).then((res) => {
-      setCategories(res.data.categories);
-    });
-  }, []);
-
+  // useEffect(() => {
+  //   axios.get(CATEGORIES_API).then((res) => {
+  //     setCategories(res.data.categories);
+  //   });
+  // }, []);
   const cancleModal = () => {
     setIsModalActive(false);
+  };
+
+  const getCategory = () => {
+    axios({
+      method: "GET",
+      url: `${CATEGORIES_API}`,
+    })
+      .then((res) => {
+        dispatch(loadCategoriesData(res.data.categories));
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleCategory = (answer) => {
@@ -52,8 +65,9 @@ const ContentMenu = ({ totaCount }) => {
             },
           })
             .then(() => {
-              window.location.reload();
+              getCategory();
               setAddCategoryName("");
+              setPlusOrDelete("");
               setEditCategoryModal(false);
             })
             .catch((error) => {});
@@ -64,7 +78,7 @@ const ContentMenu = ({ totaCount }) => {
     } else if (answer === "Delete") {
       if (plusOrDelete === "Delete") {
         if (
-          editSelectCategory === "" ||
+          editSelectCategory === 0 ||
           editSelectCategory === "Select category"
         ) {
           setEditSelectCategory("Select category");
@@ -76,7 +90,7 @@ const ContentMenu = ({ totaCount }) => {
         }
       } else {
         setPlusOrDelete("Delete");
-        setEditSelectCategory("");
+        setEditSelectCategory(0);
       }
     } else if (answer === "Back") {
       setPlusOrDelete("");
@@ -209,6 +223,7 @@ const ContentMenu = ({ totaCount }) => {
         )}
         {deletecategory && (
           <CategoryDeleteModal
+            setCategoryAct={setEditSelectCategory}
             deletecategoryName={editSelectCategory.category_name}
             deletecategoryId={editSelectCategory.category_id}
             categoriesList={categories}

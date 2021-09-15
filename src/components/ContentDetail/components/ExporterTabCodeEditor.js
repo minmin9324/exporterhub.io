@@ -23,6 +23,8 @@ const ExporterTabCodeEditor = ({
   fileContent,
   handleMode,
   type,
+  fileSha,
+  csvSha,
 }) => {
   // const { id } = useParams();
   const dispatch = useDispatch();
@@ -39,7 +41,7 @@ const ExporterTabCodeEditor = ({
               content: "",
             }
           : {
-              fileName: fileName.slice(0, -5),
+              fileName: fileName.slice(0, fileName.lastIndexOf("_")),
               description: fileDescription,
               content: fileContent,
             }
@@ -50,7 +52,9 @@ const ExporterTabCodeEditor = ({
       edittingAlertRuleDescription(fileName === "" ? "" : fileDescription)
     );
     dispatch(
-      edittingAlertRuleFileName(fileName === "" ? "" : fileName.slice(0, -5))
+      edittingAlertRuleFileName(
+        fileName === "" ? "" : fileName.slice(0, fileName.lastIndexOf("_"))
+      )
     );
   }, [fileName]);
 
@@ -78,10 +82,10 @@ const ExporterTabCodeEditor = ({
     //   },
     //   data: {
     //     codeFileName: `${title}${type}`,
-    //     "code-SHA": codeSha,
+    //     "file_sha": fileSha,
     //     mdFileName: `${title}${type}.md`,
     //     mdFile: wholeEncode,
-    //     "md-SHA": mdSha,
+    //     "csv_sha": csvSha,
     //     message:
     //       mdSha === null ? `CREATE ${title}${type}` : `UPDATE ${title}${type}`,
     //   }
@@ -104,7 +108,7 @@ const ExporterTabCodeEditor = ({
               id="fileName"
               value={edittingAlert.fileName}
               type="text"
-              placeholder="fileName"
+              placeholder="FileName"
               dark={changeTheme}
               onChange={handleFileInfo}
             />
@@ -114,7 +118,7 @@ const ExporterTabCodeEditor = ({
             id="description"
             as="textarea"
             name="content"
-            placeholder="description"
+            placeholder="Description"
             value={edittingAlert.description}
             cols="150"
             rows="3"

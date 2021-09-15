@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { filterByCate } from "../../store/actions/exporterActions";
+import {
+  filterByCate,
+  loadCategoriesData,
+} from "../../store/actions/exporterActions";
 import styled from "styled-components";
 import { AiFillSetting } from "react-icons/ai";
 import { FiPlus } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
-
 import { CATEGORIES_API } from "../../config";
 import axios from "axios";
 import CategoryDeleteModal from "../Modal/CategoryDeleteModal";
@@ -19,33 +21,53 @@ const Sider = () => {
   const [edit, setEdit] = useState(false);
   const [addCategoryName, setAddCategoryName] = useState("");
   const [deletecategory, setDeletecategory] = useState(false);
-  const [categoryAct, setcategoryAct] = useState(0);
+  const [categoryAct, setCategoryAct] = useState(0);
   const [alert, setAlert] = useState(false);
 
   const handleClickCategoryAct = (id) => {
-    setcategoryAct(id);
+    setCategoryAct(id);
+  };
+
+  const getCategory = () => {
+    axios({
+      method: "GET",
+      url: `${CATEGORIES_API}`,
+    })
+      .then((res) => {
+        dispatch(loadCategoriesData(res.data.categories));
+      })
+      .catch((err) => console.log(err));
   };
 
   const addCategory = (editType) => {
     if (editType === "add" && !addCategoryName) {
-      setAlert(true);
+      setAlert(1);
     } else if (editType === "add" && addCategoryName) {
-      axios({
-        method: "post",
-        url: `${CATEGORIES_API}`,
-        data: {
-          category: addCategoryName,
-        },
-        headers: {
-          Authorization: sessionStorage.getItem("access_token"),
-        },
-      })
-        .then(() => {
-          window.location.reload();
-          setEdit(false);
-          setAddCategoryName("");
+      const isSame = categories.filter(
+        (category) =>
+          category.category_name.toLowerCase() === addCategoryName.toLowerCase()
+      );
+      if (isSame.length === 0) {
+        axios({
+          method: "post",
+          url: `${CATEGORIES_API}`,
+          data: {
+            category: addCategoryName,
+          },
+          headers: {
+            Authorization: sessionStorage.getItem("access_token"),
+          },
         })
-        .catch((error) => {});
+          .then(() => {
+            // window.location.reload();
+            getCategory();
+            setEdit(false);
+            setAddCategoryName("");
+          })
+          .catch((error) => {});
+      } else {
+        setAlert(2);
+      }
     } else if (typeof editType === "object") {
       setDeletecategory(editType);
     }
@@ -89,13 +111,16 @@ const Sider = () => {
               ></Category>
               <FiPlus className="edit" onClick={() => addCategory("add")} />
             </Title>
-            {alert && (
-              <Title alert="alert">Please enter the category name</Title>
-            )}
+
+            <Title alert="alert">
+              {alert === 1 && "Please enter the category name"}
+              {alert === 2 && "This name already exists."}
+            </Title>
           </Fragment>
         )}
         {deletecategory && (
           <CategoryDeleteModal
+            setCategoryAct={setCategoryAct}
             categoriesList={categories}
             deletecategoryId={deletecategory.category_id}
             deletecategoryName={deletecategory.category_name}
@@ -111,6 +136,7 @@ const Sider = () => {
           onClick={(e) => {
             handleClickCategoryAct(0);
             callDispatch(e);
+            alert !== false && setAlert(false);
           }}
         >
           All
@@ -118,6 +144,7 @@ const Sider = () => {
         {categories &&
           categories.map((category) => (
             <Category
+              key={category.category_id}
               edit={edit}
               dark={changeTheme}
               active={category.category_id === categoryAct}
@@ -127,6 +154,7 @@ const Sider = () => {
                 onClick={(e) => {
                   handleClickCategoryAct(category.category_id);
                   callDispatch(e);
+                  alert !== false && setAlert(false);
                 }}
               >
                 {category.category_name}
