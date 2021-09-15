@@ -118,104 +118,109 @@ const ContentMenu = ({ totaCount }) => {
   };
 
   return (
-    <Div>
-      {/* <span>{totalCount} items</span> */}
-      <SelectBox>
-        <Categories dark={changeTheme}>
-          <p>Categories :</p>
-          <Select dark={changeTheme} onChange={callDispatch}>
-            <option>All</option>
-            {categories &&
-              categories.map((category) => (
-                <option key={category.category_id}>
-                  {category.category_name}
-                </option>
-              ))}
-          </Select>
-          {isAdmin && (
-            <AiFillSetting
-              className="edit"
-              onClick={() => setEditCategoryModal(true)}
-            />
-          )}
-        </Categories>
-        <Sort dark={changeTheme}>
-          <select onChange={optionSelector}>
-            <option>Most popular</option>
-            <option>Recent</option>
-            <option>Trending</option>
-          </select>
-        </Sort>
-      </SelectBox>
-      <SearchBox>
-        <Search />
-      </SearchBox>
-      {isAdmin && (
-        <Button dark={changeTheme} onClick={() => setIsModalActive(true)}>
-          <span>REGISTER</span>
-        </Button>
-      )}
-      {isModalActive && <RegisterModal cancleModal={cancleModal} />}
+    <>
+      <Div>
+        {/* <span>{totalCount} items</span> */}
+        <SelectBox>
+          <Categories dark={changeTheme}>
+            <p>Categories :</p>
+            <Select dark={changeTheme} onChange={callDispatch}>
+              <option>All</option>
+              {categories &&
+                categories.map((category) => (
+                  <option key={category.category_id}>
+                    {category.category_name}
+                  </option>
+                ))}
+            </Select>
+            {isAdmin && (
+              <AiFillSetting
+                className="edit"
+                onClick={() => setEditCategoryModal(true)}
+              />
+            )}
+          </Categories>
+          <Sort dark={changeTheme}>
+            <select dark={changeTheme} onChange={optionSelector}>
+              <option>Most popular</option>
+              <option>Recent</option>
+              <option>Trending</option>
+            </select>
+          </Sort>
+        </SelectBox>
+        <SearchBox>
+          <Search />
+        </SearchBox>
+        {isAdmin && (
+          <Button dark={changeTheme} onClick={() => setIsModalActive(true)}>
+            <span>REGISTER</span>
+          </Button>
+        )}
+        {isModalActive && <RegisterModal cancleModal={cancleModal} />}
+
+        {editCategoryModal && (
+          <DeleteModal
+            handleDelete={handleCategory}
+            content={plusOrDelete === "" ? "Edit Category" : ""}
+            button1="Delete"
+            deletebutton1={plusOrDelete === "Delete" || plusOrDelete === ""}
+            button2={plusOrDelete !== "" ? "Back" : "Cancel"}
+          >
+            {plusOrDelete === "Delete" && (
+              <SelectBox dark={changeTheme} delete={true}>
+                <Select dark={changeTheme} onChange={selectCategory}>
+                  <option>Select category</option>
+                  {categories.map((category) => {
+                    return (
+                      <option key={category.category_id}>
+                        {category.category_name}
+                      </option>
+                    );
+                  })}
+                </Select>
+                {editSelectCategory === "Select category" && (
+                  <p className="alert">Select the category to delete.</p>
+                )}
+              </SelectBox>
+            )}
+
+            {plusOrDelete === "Plus category" && (
+              <SelectBox>
+                <input
+                  className="inputDiv"
+                  onChange={({ target }) => {
+                    setAddCategoryName(target.value);
+                    setAlert(false);
+                  }}
+                  placeholder="New categoryName"
+                ></input>
+                {alert && (
+                  <p className="alert">Please enter the category name</p>
+                )}
+              </SelectBox>
+            )}
+
+            {(plusOrDelete === "Plus category" || plusOrDelete === "") && (
+              <button onClick={() => handleCategory("Plus category")}>
+                Plus category
+              </button>
+            )}
+          </DeleteModal>
+        )}
+        {deletecategory && (
+          <CategoryDeleteModal
+            deletecategoryName={editSelectCategory.category_name}
+            deletecategoryId={editSelectCategory.category_id}
+            categoriesList={categories}
+            setDeletecategory={setDeletecategory}
+            ismobile={true}
+          />
+        )}
+      </Div>
       <SearchMoileBox>
         <Search />
       </SearchMoileBox>
-      {editCategoryModal && (
-        <DeleteModal
-          handleDelete={handleCategory}
-          content={plusOrDelete === "" ? "Edit Category" : ""}
-          button1="Delete"
-          deletebutton1={plusOrDelete === "Delete" || plusOrDelete === ""}
-          button2={plusOrDelete !== "" ? "Back" : "Cancel"}
-        >
-          {plusOrDelete === "Delete" && (
-            <SelectBox delete={true}>
-              <select onChange={selectCategory}>
-                <option>Select category</option>
-                {categories.map((category) => {
-                  return (
-                    <option key={category.category_id}>
-                      {category.category_name}
-                    </option>
-                  );
-                })}
-              </select>
-              {editSelectCategory === "Select category" && (
-                <p className="alert">Select the category to delete.</p>
-              )}
-            </SelectBox>
-          )}
-
-          {plusOrDelete === "Plus category" && (
-            <SelectBox>
-              <input
-                className="inputDiv"
-                onChange={({ target }) => {
-                  setAddCategoryName(target.value);
-                  setAlert(false);
-                }}
-                placeholder="New categoryName"
-              ></input>
-              {alert && <p className="alert">Please enter the category name</p>}
-            </SelectBox>
-          )}
-
-          {(plusOrDelete === "Plus category" || plusOrDelete === "") && (
-            <button onClick={() => handleCategory("Plus category")}>
-              Plus category
-            </button>
-          )}
-        </DeleteModal>
-      )}
-      {deletecategory && (
-        <CategoryDeleteModal
-          deletecategoryName={editSelectCategory.category_name}
-          deletecategoryId={editSelectCategory.category_id}
-          categoriesList={categories}
-          setDeletecategory={setDeletecategory}
-          ismobile={true}
-        />
-      )}
-    </Div>
+    </>
   );
 };
 
@@ -223,6 +228,7 @@ const Div = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
   font-size: 16px;
   @media ${({ theme }) => theme.media.mobile} {
@@ -272,13 +278,12 @@ const Select = styled.select`
   margin-right: 10px;
   @media ${({ theme }) => theme.media.mobile} {
     display: block;
-    width: 80px;
     font-size: 13px;
     color: ${(props) => (props.dark ? "#ffffff" : "black")};
   }
-  /* option {
+  option {
     color: ${(props) => (props.dark ? "#ffffff" : "black")};
-  } */
+  }
 `;
 
 const Button = styled.button`
@@ -298,6 +303,7 @@ const Sort = styled.div`
     option {
       background-color: #ffffff;
       color: black;
+      color: ${(props) => (props.dark ? "#ffffff" : "black")};
     }
   }
 

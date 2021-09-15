@@ -14,13 +14,10 @@ const TARGET_UNFORK_REPO = "TARGET_UNFORK_REPO";
 const GET_ADMIN_STATE = "GET_ADMIN_STATE";
 const GET_DARK_THEME = "GET_DARK_THEME";
 const EDITTING_ALERT_RULE = "EDITTING_ALERT_RULE";
-<<<<<<< HEAD
 const EDITTING_ALERT_RULE_FILENAME = "EDITTING_ALERT_RULE_FILENAME";
 const EDITTING_ALERT_RULE_DESCRIPTION = "EDITTING_ALERT_RULE_DESCRIPTION";
 const BEFORE_EDIT_ALERT_RULE = "BEFORE_EDIT_ALERT_RULE";
 
-=======
->>>>>>> 0f92176 ([Modify] delete button click range)
 export const adminTypeAdd = (payload) => ({
   type: ADD_ADMIN_TYPE_STATE,
   payload,
@@ -88,7 +85,6 @@ export const edittingAlertRule = (payload) => ({
   type: EDITTING_ALERT_RULE,
   payload,
 });
-<<<<<<< HEAD
 export const edittingAlertRuleFileName = (payload) => ({
   type: EDITTING_ALERT_RULE_FILENAME,
   payload,
@@ -101,5 +97,3 @@ export const beforeEdittingAlertRule = (payload) => ({
   type: BEFORE_EDIT_ALERT_RULE,
   payload,
 });
-=======
->>>>>>> 0f92176 ([Modify] delete button click range)
