@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models       import Q, Max
 from django.utils           import timezone
 from django.conf            import settings
+from django.db              import transaction
 
 from .models                import Category, Exporter, Release, Official 
 from headtoken.models       import Token
@@ -20,6 +21,51 @@ api_url = 'https://api.github.com/repos/'
 PATTERN = r"!\[(\w*|\s|\w+( \w+)*)\]\(([^,:!]*|\/[^,:!]*\.\w+|\w*.\w*)\)"
 
 
+# class CategoryView(View):
+#     def get(self, request):
+#         categories = Category.objects.all().order_by('name')
+#         data = {
+#             "categories": [{   
+#                 "category_id"  : category.id,
+#                 "category_name": category.name
+#             } for category in categories]
+#         }
+#         return JsonResponse(data, status=200)
+
+#     @admin_decorator
+#     def post(self, request):
+#         data       = json.loads(request.body)
+#         category, is_create = Category.objects.get_or_create(
+#             name = data['category']
+#         )
+        
+#         if not is_create:
+#             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+#         return JsonResponse({'message':'SUCCESS'}, status=201)
+    
+#     @admin_decorator
+#     def patch(self, request):
+#         data                = json.loads(request.body)
+#         category_id         = data['category_id']
+#         feature_category_id = data['feature_category_id']
+
+#         if not Category.objects.filter(id=category_id).exists:
+#             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400) 
+            
+#         if not Category.objects.filter(id=feature_category_id).exists:
+#             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+
+#         Exporter.objects.filter(category_id = category_id).update(category_id=feature_category_id)
+#         Category.objects.filter(id=category_id).delete()
+#         return JsonResponse({'message':'SUCCESS'}, status=200)
+
+#     @admin_decorator
+#     def delete(self, request, category_id):
+#         if not Category.objects.filter(id=category_id).exists:
+#             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+#         Exporter.objects.filter(category_id=category_id).delete()
+#         Category.objects.filter(id=category_id).delete()
+#         return JsonResponse({'message':'SUCCESS'}, status=200)
 class CategoryView(View):
     def get(self, request):
         categories = Category.objects.all().order_by('name')
@@ -33,38 +79,79 @@ class CategoryView(View):
 
     @admin_decorator
     def post(self, request):
-        data       = json.loads(request.body)
+        data   = json.loads(request.body)
         category, is_create = Category.objects.get_or_create(
             name = data['category']
         )
-        
+
         if not is_create:
             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
         return JsonResponse({'message':'SUCCESS'}, status=201)
     
     @admin_decorator
+    @transaction.atomic
     def patch(self, request):
         data                = json.loads(request.body)
         category_id         = data['category_id']
         feature_category_id = data['feature_category_id']
-
+        user                = request.user
+        token               = user.github_token
+        repo                = f"{settings.ORGANIZATION}/exporterhub.io" 
+        url                 = f"https://api.github.com/repos/{repo}/contents/api/exporter_list.csv"
         if not Category.objects.filter(id=category_id).exists:
             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400) 
-            
         if not Category.objects.filter(id=feature_category_id).exists:
             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
-
+        category = Category.objects.get(id=category_id)
+        feature_category = Category.objects.get(id=feature_category_id)
+        # file = open("exporter_list.csv", 'r')
+        # reader = csv.reader(file)
+        # lines = []
+        # for line in reader:
+        #     if line[4] == category.name:
+        #         line[4] = feature_category.name
+        #     lines.append(line, end='\n')
+        # file.close()
+        # file   = open("exporter_list.csv", 'w', newline='')
+        # writer = csv.writer(file)
+        # writer.writerow(lines)
+        # file.close()
+        # result = requests.put(url, lines, headers={'Authorization': 'token ' + token})
+        # if result.status_code == 200:
         Exporter.objects.filter(category_id = category_id).update(category_id=feature_category_id)
         Category.objects.filter(id=category_id).delete()
         return JsonResponse({'message':'SUCCESS'}, status=200)
+        # else:
+    #        return JsonResponse({'message': 'GITHUB_REPO_API_ERROR'}, status=404)
 
     @admin_decorator
+    @transaction.atomic
     def delete(self, request, category_id):
+        user   = request.user
+        token  = user.github_token
+        repo   = f"{settings.ORGANIZATION}/exporterhub.io" 
+        url    = f"https://api.github.com/repos/{repo}/contents/api/exporter_list.csv" 
+        category = Category.objects.get(id=category_id)
         if not Category.objects.filter(id=category_id).exists:
             return JsonResponse({'message':'EXISTING_CATEGORY'}, status=400)
+        # file = open("exporter_list.csv", 'r')
+        # reader = file.readlines()
+        # lines = []
+        # for line in reader:
+        #     if line[4] == category:
+        #         del reader[line]
+        # file   = open("exporter_list.csv", 'w', newline='')
+        # writer = csv.writer(file)
+        # for line in lines:
+        #     writer.writerow(line)
+        # file.close()
+        #result = requests.put(url, lines, headers={'Authorization': 'token ' + token})
+        #if result.status_code == 200:
         Exporter.objects.filter(category_id=category_id).delete()
         Category.objects.filter(id=category_id).delete()
         return JsonResponse({'message':'SUCCESS'}, status=200)
+        # else:
+        #     return JsonResponse({'message': 'GITHUB_REPO_API_ERROR'}, status=404)
 
 class ExporterView(View):
     def get_repo(self, github_token, repo_url):

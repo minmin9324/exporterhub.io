@@ -3,10 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { filterByCate } from "../../store/actions/exporterActions";
 import styled from "styled-components";
 import { AiFillSetting } from "react-icons/ai";
-import { FiMinus, FiPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
+import { RiDeleteBinLine } from "react-icons/ri";
+
 import { CATEGORIES_API } from "../../config";
 import axios from "axios";
-import ListDeleteModal from "../Modal/ListDeleteModal";
+import CategoryDeleteModal from "../Modal/CategoryDeleteModal";
 import { Fragment } from "react";
 
 const Sider = () => {
@@ -93,7 +95,7 @@ const Sider = () => {
           </Fragment>
         )}
         {deletecategory && (
-          <ListDeleteModal
+          <CategoryDeleteModal
             categoriesList={categories}
             deletecategoryId={deletecategory.category_id}
             deletecategoryName={deletecategory.category_name}
@@ -129,9 +131,12 @@ const Sider = () => {
               >
                 {category.category_name}
               </Div>
-              {edit && (
-                <DeleteButton onClick={() => addCategory(category)}>
-                  <FiMinus />
+              {edit && categoryAct === category.category_id && (
+                <DeleteButton
+                  className="deleteIcon"
+                  onClick={() => addCategory(category)}
+                >
+                  <RiDeleteBinLine size="17px" />
                 </DeleteButton>
               )}
             </Category>

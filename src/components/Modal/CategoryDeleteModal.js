@@ -6,11 +6,12 @@ import { FiArrowDown } from "react-icons/fi";
 import { CATEGORIES_API } from "../../config";
 import DeleteModal from "./DeleteModal";
 
-const ListDeleteModal = ({
+const CategoryDeleteModal = ({
   deletecategoryName,
   deletecategoryId,
   categoriesList,
   setDeletecategory,
+  ismobile = false,
 }) => {
   const [sureDelete, setSureDelete] = useState(false);
   const [selectCategory, setSelectCategory] = useState("Select category");
@@ -48,7 +49,7 @@ const ListDeleteModal = ({
           window.location.reload();
           setDeletecategory(false);
         })
-        .catch((error) => {});
+        .catch((error) => console.log(error));
     } else if (answer === "delete") {
       axios({
         method: "delete",
@@ -61,18 +62,23 @@ const ListDeleteModal = ({
           window.location.reload();
           setDeletecategory(false);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
   return (
     <>
-      {!sureDelete ? (
+      {!sureDelete && !ismobile ? (
         <DeleteModal handleDelete={handleDelete} content="Delete?" />
       ) : (
         <DeleteListContainer>
           <Div>
-            <h4>삭제 전, 카드들을 옮길 카테고리를 선택해주세요</h4>
+            <h4>
+              If you want to move exporters before deleting, select the category
+              you want to move.
+            </h4>
             <h5>{deletecategoryName + " Category"}</h5>
             <FiArrowDown color={"#b2b2b2"} />
             <select
@@ -107,7 +113,7 @@ const ListDeleteModal = ({
   );
 };
 
-export default ListDeleteModal;
+export default CategoryDeleteModal;
 
 const DeleteListContainer = styled.div`
   position: fixed;
@@ -136,13 +142,17 @@ const Div = styled.div`
   select {
     ${({ theme }) => theme.ModalButton}
   }
+  h4 {
+    margin-bottom: 15px;
+    text-align: center;
+  }
   h5 {
-    margin-top: 5px;
+    margin: 5px;
     font-size: 13px;
     color: #b2b2b2;
   }
   p {
-    margin-top: 5px;
+    margin-top: 8px;
     font-size: 13px;
     color: red;
   }
@@ -156,7 +166,7 @@ const Container = styled.div`
   button {
     width: 230px;
     height: 35px;
-    margin-top: 20px;
+    margin-top: 15px;
     border-radius: 20px;
     background-color: #85dbc3;
     color: #ffffff;
