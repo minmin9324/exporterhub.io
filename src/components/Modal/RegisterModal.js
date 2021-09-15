@@ -93,8 +93,7 @@ const RegisterModal = ({ cancleModal }) => {
         setExporterTitle("");
         setRepoUrl("");
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
   };
 
   return (
