@@ -81,6 +81,7 @@ const Permission = () => {
         })
         .catch((err) => {
           console.log(err);
+          setIsAdminAddModalActive(false);
         });
     }
   };
