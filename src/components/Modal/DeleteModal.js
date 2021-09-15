@@ -1,14 +1,24 @@
 import React from "react";
 import styled from "styled-components";
 
-const DeleteModal = ({ handleDelete, content }) => {
+const DeleteModal = ({
+  handleDelete,
+  content,
+  button1 = "Yes",
+  button2 = "Cancel",
+  deletebutton1 = true,
+  children,
+}) => {
   return (
     <DeleteContainer>
       <Div>
         <h4>{content}</h4>
         <Container>
-          <button onClick={() => handleDelete("Yes")}>Yes</button>
-          <button onClick={() => handleDelete("Cancel")}>Cancel</button>
+          {children}
+          {deletebutton1 && (
+            <button onClick={() => handleDelete(button1)}>{button1}</button>
+          )}
+          <button onClick={() => handleDelete(button2)}>{button2}</button>
         </Container>
       </Div>
     </DeleteContainer>
@@ -46,7 +56,17 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  select {
+    background: white;
+    ${({ theme }) => theme.ModalButton}
+    font-weight: 500;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.7);
+  }
+  input {
+    ${({ theme }) => theme.ModalButton}
+    margin-bottom : 10px
+  }
   button {
     width: 230px;
     height: 35px;
