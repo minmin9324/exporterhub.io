@@ -20,7 +20,6 @@ const CategoryDeleteModal = ({
   ismobile = false,
 }) => {
   const dispatch = useDispatch();
-
   const [sureDelete, setSureDelete] = useState(false);
   const [selectCategory, setSelectCategory] = useState("Select category");
   const [isSelected, setIsSelected] = useState(true);

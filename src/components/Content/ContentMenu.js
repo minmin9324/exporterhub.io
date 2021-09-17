@@ -23,11 +23,9 @@ const ContentMenu = ({ totaCount }) => {
   const [plusOrDelete, setPlusOrDelete] = useState("");
   const [editSelectCategory, setEditSelectCategory] = useState(0);
   const [addCategoryName, setAddCategoryName] = useState("");
-  // const [categories, setCategories] = useState([]);
   const isAdmin = useSelector((store) => store.adminReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const categories = useSelector((store) => store.categoryReducer);
-
   // useEffect(() => {
   //   axios.get(CATEGORIES_API).then((res) => {
   //     setCategories(res.data.categories);
@@ -48,12 +46,17 @@ const ContentMenu = ({ totaCount }) => {
       .catch((err) => console.log(err));
   };
 
-  const handleCategory = (answer) => {
-    if (answer === "Plus category") {
-      if (plusOrDelete === "Plus category") {
-        if (!addCategoryName) {
-          setAlert(true);
-        } else {
+  const handleAddCategory = () => {
+    if (plusOrDelete === "Plus category") {
+      if (!addCategoryName) {
+        setAlert(0);
+      } else {
+        const isSame = categories.filter(
+          (category) =>
+            category.category_name.toLowerCase() ===
+            addCategoryName.toLowerCase()
+        );
+        if (isSame.length === 0) {
           axios({
             method: "post",
             url: `${CATEGORIES_API}`,
@@ -71,11 +74,18 @@ const ContentMenu = ({ totaCount }) => {
               setEditCategoryModal(false);
             })
             .catch((error) => {});
+        } else {
+          setAlert(1);
         }
-      } else {
-        setPlusOrDelete("Plus category");
       }
-    } else if (answer === "Delete") {
+    } else {
+      setAlert(false);
+      setPlusOrDelete("Plus category");
+    }
+  };
+
+  const handleCategory = (answer) => {
+    if (answer === "Delete") {
       if (plusOrDelete === "Delete") {
         if (
           editSelectCategory === 0 ||
@@ -208,16 +218,22 @@ const ContentMenu = ({ totaCount }) => {
                   }}
                   placeholder="New categoryName"
                 ></input>
-                {alert && (
-                  <p className="alert">Please enter the category name</p>
+
+                {alert === 0 && (
+                  <p className="alert">
+                    {alert === 0 && "Please enter the category name."}
+                  </p>
+                )}
+                {alert === 1 && (
+                  <p className="alert">
+                    {alert && "This name already exists."}
+                  </p>
                 )}
               </SelectBox>
             )}
 
             {(plusOrDelete === "Plus category" || plusOrDelete === "") && (
-              <button onClick={() => handleCategory("Plus category")}>
-                Plus category
-              </button>
+              <button onClick={handleAddCategory}>Plus category</button>
             )}
           </DeleteModal>
         )}

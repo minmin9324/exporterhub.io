@@ -64,7 +64,7 @@ const RegisterModal = ({ cancleModal }) => {
   };
 
   const selectCategory = (e) => {
-    if (e.target.value === "+ New category") {
+    if (e.target.value === "+ New category !") {
       setCategory(e.target.value);
       setPluscategory(true);
     } else {
@@ -121,6 +121,7 @@ const RegisterModal = ({ cancleModal }) => {
             onChange={selectCategory}
           >
             <option>Select category</option>
+            <option>+ New category !</option>
             {categories.map((category) => {
               return (
                 <option key={category.category_id}>
@@ -128,7 +129,6 @@ const RegisterModal = ({ cancleModal }) => {
                 </option>
               );
             })}
-            <option>+ New category</option>
           </select>
           {pluscategory ? (
             <input

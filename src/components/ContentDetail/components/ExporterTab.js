@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-// import axios from "axios";
+import axios from "axios";
 import ExporterTabDataviewer from "./ExporterTabDataviewer";
 import { useSelector } from "react-redux";
-// import { useParams } from "react-router";
-// import { API_SURVER } from "../../../config";
+import { useParams } from "react-router";
+import { API_SURVER } from "../../../config";
 import ExporterDetailTabList from "../../Sider/ExporterDetailTabList";
 
 const ExporterTab = ({ title, type }) => {
-  // const { id } = useParams();
+  const { id } = useParams();
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   // const [mdSha, setMdSha] = useState();
   // const [codeSha, setCodeSha] = useState();
@@ -18,7 +18,7 @@ const ExporterTab = ({ title, type }) => {
   const [select, setSelect] = useState(0);
 
   const handleMode = () => {
-    setIsEditMode(!isEditMode);
+    // setIsEditMode(!isEditMode);
     if (isEditMode) {
       setModify(false);
     }
@@ -26,34 +26,41 @@ const ExporterTab = ({ title, type }) => {
   };
 
   useEffect(() => {
+    setExporterCsv("default");
+    setSelect(0);
+    setIsEditMode(false);
+    setModify(false);
     getData();
-  }, []);
+  }, [type]);
 
   const getData = () => {
-    // const TOKEN = sessionStorage.getItem("access_token");
-    // const HEADER = TOKEN && { Authorization: TOKEN };
+    const TOKEN = sessionStorage.getItem("access_token");
+    const HEADER = TOKEN && { Authorization: TOKEN };
+    const fileType = type.slice(1, type.lastIndexOf("."));
+    // if(res.data.message==)
 
-    // axios({
-    //   method: "GET",
-    //   url: `${API_SURVER}/exporter/${id}/tab?type={type}`,
-    //   headers: HEADER,
-    // })
-    //   .then((res) => {
-    //     console.log(res);
-    //     setExporterCsv(
-    //       res.data.md_content === null ? "N/A" : res.data.md_content
-    //     );
-    // setMdSha(res.data.md_sha);
-    // setCodeSha(res.data.code_sha);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    axios({
+      method: "GET",
+      url: `${API_SURVER}/exporter/${id}/tab?type=${fileType}`,
+      headers: HEADER,
+    })
+      .then((res) => {
+        console.log(res);
+        setExporterCsv(
+          res.data.message === "No_Content" ? [] : res.data.message
+        );
+        res.data.message !== "No_Content"
+          ? setSelect(data.message[0].file_id)
+          : setSelect(0);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-    setExporterCsv(data.message === [] ? [] : data.message);
-    data.message.length !== 0
-      ? setSelect(data.message[0].file_id)
-      : setSelect(0);
+    // setExporterCsv(data.message === [] ? [] : data.message);
+    // data.message.length !== 0
+    //   ? setSelect(data.message[0].file_id)
+    //   : setSelect(0);
   };
 
   return (
@@ -89,6 +96,7 @@ const ExporterTab = ({ title, type }) => {
         <ExporterTabDataviewer
           select={select}
           isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
           modify={modify}
           handleMode={handleMode}
           title={title}
@@ -173,7 +181,8 @@ const data = {
       file_sha: "5335d5f2a06b228a8ec89b52f5e7981d8eb3d3f2",
       csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
       file_id: "03",
-      csv_desc: "Host network interfaces are probably sending too much data",
+      csv_desc:
+        "Host network interfaces are probably sending too mucs sdf dfsdfsdfd  ss ssss sd sdffgdfgfh  fghsdfsdgdfh dfgfd gdfg dfg h data",
     },
   ],
 };

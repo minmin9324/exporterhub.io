@@ -11,6 +11,7 @@ const ExporterTabDataviewer = ({
   handleMode,
   title,
   type,
+  setIsEditMode,
   isEditMode,
   exporterCsv,
   select,
@@ -21,6 +22,17 @@ const ExporterTabDataviewer = ({
   const selectFileInfo =
     select !== "New" && exporterCsv !== "default" && exporterCsv.length !== 0
       ? exporterCsv.filter((file) => file.file_id === select)
+      : exporterCsv !== "default" && exporterCsv.length !== 0
+      ? [
+          {
+            file_content: "",
+            file_url: "",
+            file_sha: exporterCsv[0].file_sha,
+            csv_sha: exporterCsv[0].csv_sha,
+            file_id: "",
+            csv_desc: "",
+          },
+        ]
       : [
           {
             file_content: "",
@@ -31,6 +43,10 @@ const ExporterTabDataviewer = ({
             csv_desc: "",
           },
         ];
+  // console.log(
+  //   selectFileInfo,
+  //   exporterCsv.filter((file) => file.file_id === select)
+  // );
   return (
     <>
       <Header>
@@ -41,7 +57,7 @@ const ExporterTabDataviewer = ({
 
         {isAdmin && (
           <div>
-            <Button onClick={handleMode}>
+            <Button onClick={() => setIsEditMode((prev) => !prev)}>
               <span>{!isEditMode ? <FiEdit /> : <BiUndo />}</span>
               <span>{!isEditMode ? "edit" : "Back"}</span>
             </Button>
@@ -58,7 +74,7 @@ const ExporterTabDataviewer = ({
               </Loading>
             ) : (
               <Fragment>
-                {emty === false && selectFileInfo[0].file_content !== "" ? (
+                {emty === false && selectFileInfo.length !== 0 ? (
                   <ExporterContainer>
                     <h1>
                       {selectFileInfo[0].file_url.slice(
