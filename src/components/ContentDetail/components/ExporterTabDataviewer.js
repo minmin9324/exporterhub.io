@@ -43,10 +43,6 @@ const ExporterTabDataviewer = ({
             csv_desc: "",
           },
         ];
-  // console.log(
-  //   selectFileInfo,
-  //   exporterCsv.filter((file) => file.file_id === select)
-  // );
   return (
     <>
       <Header>
