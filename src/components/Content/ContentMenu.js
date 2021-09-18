@@ -7,11 +7,13 @@ import DeleteModal from "../Modal/DeleteModal";
 import {
   filterBySort,
   filterByCate,
+  loadCategoriesData,
 } from "../../store/actions/exporterActions";
 import { CATEGORIES_API } from "../../config";
 import Search from "../Header/Search";
 import RegisterModal from "../Modal/RegisterModal";
 import CategoryDeleteModal from "../Modal/CategoryDeleteModal";
+
 const ContentMenu = ({ totaCount }) => {
   const dispatch = useDispatch();
   const [isModalActive, setIsModalActive] = useState(false);
@@ -19,28 +21,42 @@ const ContentMenu = ({ totaCount }) => {
   const [deletecategory, setDeletecategory] = useState(false);
   const [alert, setAlert] = useState(false);
   const [plusOrDelete, setPlusOrDelete] = useState("");
-  const [editSelectCategory, setEditSelectCategory] = useState("");
+  const [editSelectCategory, setEditSelectCategory] = useState(0);
   const [addCategoryName, setAddCategoryName] = useState("");
-  const [categories, setCategories] = useState([]);
   const isAdmin = useSelector((store) => store.adminReducer);
   const changeTheme = useSelector((store) => store.darkThemeReducer);
-
-  useEffect(() => {
-    axios.get(CATEGORIES_API).then((res) => {
-      setCategories(res.data.categories);
-    });
-  }, []);
-
+  const categories = useSelector((store) => store.categoryReducer);
+  // useEffect(() => {
+  //   axios.get(CATEGORIES_API).then((res) => {
+  //     setCategories(res.data.categories);
+  //   });
+  // }, []);
   const cancleModal = () => {
     setIsModalActive(false);
   };
 
-  const handleCategory = (answer) => {
-    if (answer === "Plus category") {
-      if (plusOrDelete === "Plus category") {
-        if (!addCategoryName) {
-          setAlert(true);
-        } else {
+  const getCategory = () => {
+    axios({
+      method: "GET",
+      url: `${CATEGORIES_API}`,
+    })
+      .then((res) => {
+        dispatch(loadCategoriesData(res.data.categories));
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleAddCategory = () => {
+    if (plusOrDelete === "Plus category") {
+      if (!addCategoryName) {
+        setAlert(0);
+      } else {
+        const isSame = categories.filter(
+          (category) =>
+            category.category_name.toLowerCase() ===
+            addCategoryName.toLowerCase()
+        );
+        if (isSame.length === 0) {
           axios({
             method: "post",
             url: `${CATEGORIES_API}`,
@@ -52,19 +68,27 @@ const ContentMenu = ({ totaCount }) => {
             },
           })
             .then(() => {
-              window.location.reload();
+              getCategory();
               setAddCategoryName("");
+              setPlusOrDelete("");
               setEditCategoryModal(false);
             })
             .catch((error) => {});
+        } else {
+          setAlert(1);
         }
-      } else {
-        setPlusOrDelete("Plus category");
       }
-    } else if (answer === "Delete") {
+    } else {
+      setAlert(false);
+      setPlusOrDelete("Plus category");
+    }
+  };
+
+  const handleCategory = (answer) => {
+    if (answer === "Delete") {
       if (plusOrDelete === "Delete") {
         if (
-          editSelectCategory === "" ||
+          editSelectCategory === 0 ||
           editSelectCategory === "Select category"
         ) {
           setEditSelectCategory("Select category");
@@ -76,7 +100,7 @@ const ContentMenu = ({ totaCount }) => {
         }
       } else {
         setPlusOrDelete("Delete");
-        setEditSelectCategory("");
+        setEditSelectCategory(0);
       }
     } else if (answer === "Back") {
       setPlusOrDelete("");
@@ -194,21 +218,28 @@ const ContentMenu = ({ totaCount }) => {
                   }}
                   placeholder="New categoryName"
                 ></input>
-                {alert && (
-                  <p className="alert">Please enter the category name</p>
+
+                {alert === 0 && (
+                  <p className="alert">
+                    {alert === 0 && "Please enter the category name."}
+                  </p>
+                )}
+                {alert === 1 && (
+                  <p className="alert">
+                    {alert && "This name already exists."}
+                  </p>
                 )}
               </SelectBox>
             )}
 
             {(plusOrDelete === "Plus category" || plusOrDelete === "") && (
-              <button onClick={() => handleCategory("Plus category")}>
-                Plus category
-              </button>
+              <button onClick={handleAddCategory}>Plus category</button>
             )}
           </DeleteModal>
         )}
         {deletecategory && (
           <CategoryDeleteModal
+            setCategoryAct={setEditSelectCategory}
             deletecategoryName={editSelectCategory.category_name}
             deletecategoryId={editSelectCategory.category_id}
             categoriesList={categories}

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-// import axios from "axios";
+import axios from "axios";
 import ExporterTabDataviewer from "./ExporterTabDataviewer";
 import { useSelector } from "react-redux";
-// import { useParams } from "react-router";
-// import { API_SURVER } from "../../../config";
+import { useParams } from "react-router";
+import { API_SURVER } from "../../../config";
 import ExporterDetailTabList from "../../Sider/ExporterDetailTabList";
 
 const ExporterTab = ({ title, type }) => {
-  // const { id } = useParams();
+  const { id } = useParams();
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   // const [mdSha, setMdSha] = useState();
   // const [codeSha, setCodeSha] = useState();
@@ -18,7 +18,7 @@ const ExporterTab = ({ title, type }) => {
   const [select, setSelect] = useState(0);
 
   const handleMode = () => {
-    setIsEditMode(!isEditMode);
+    // setIsEditMode(!isEditMode);
     if (isEditMode) {
       setModify(false);
     }
@@ -26,32 +26,41 @@ const ExporterTab = ({ title, type }) => {
   };
 
   useEffect(() => {
+    setExporterCsv("default");
+    setSelect(0);
+    setIsEditMode(false);
+    setModify(false);
     getData();
-  }, []);
+  }, [type]);
 
   const getData = () => {
-    // const TOKEN = sessionStorage.getItem("access_token");
-    // const HEADER = TOKEN && { Authorization: TOKEN };
+    const TOKEN = sessionStorage.getItem("access_token");
+    const HEADER = TOKEN && { Authorization: TOKEN };
+    const fileType = type.slice(1, type.lastIndexOf("."));
+    // if(res.data.message==)
 
-    // axios({
-    //   method: "GET",
-    //   url: `${API_SURVER}/exporter/${id}/tab?type={type}`,
-    //   headers: HEADER,
-    // })
-    //   .then((res) => {
-    //     console.log(res);
-    //     setExporterCsv(
-    //       res.data.md_content === null ? "N/A" : res.data.md_content
-    //     );
-    // setMdSha(res.data.md_sha);
-    // setCodeSha(res.data.code_sha);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    axios({
+      method: "GET",
+      url: `${API_SURVER}/exporter/${id}/tab?type=${fileType}`,
+      headers: HEADER,
+    })
+      .then((res) => {
+        console.log(res);
+        setExporterCsv(
+          res.data.message === "No_Content" ? [] : res.data.message
+        );
+        res.data.message !== "No_Content"
+          ? setSelect(data.message[0].file_id)
+          : setSelect(0);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-    setExporterCsv(alertRule === null ? [] : alertRule);
-    alertRule.length !== 0 ? setSelect(alertRule[0].id) : setSelect(0);
+    // setExporterCsv(data.message === [] ? [] : data.message);
+    // data.message.length !== 0
+    //   ? setSelect(data.message[0].file_id)
+    //   : setSelect(0);
   };
 
   return (
@@ -87,6 +96,7 @@ const ExporterTab = ({ title, type }) => {
         <ExporterTabDataviewer
           select={select}
           isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
           modify={modify}
           handleMode={handleMode}
           title={title}
@@ -137,50 +147,97 @@ const Container = styled.div`
   width: 800px;
 `;
 
-const alertRule = [
-  {
-    id: 3,
-    description:
-      "Node memory is filling up (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
-    yamlContent: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
-                for: 2m
-                labels:
+const data = {
+  message: [
+    {
+      file_content: "mango_is_happy",
+      file_url:
+        "https://api.github.com/repos/Exporterhubv4/exporterhub.io/contents/contents/OpenStack/OpenStack_alert/Openstack_test1_alert.yaml",
+      file_sha: "47b22a2a469a4fe164c2ae62c2413c09586a21b0",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "01",
+      csv_desc: "teasdfasdfasdfsdafdfsadf",
+    },
+    {
+      file_content: "need change",
+      file_url:
+        "https://api.github.com/repos/Exporterhubv4/exporterhub.io/contents/contents/OpenStack/OpenStack_alert/Openstack_test_alert.yaml",
+      file_sha: "5335d5f2a06b228a8ec89b52f5e7981d8eb3d3f2",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "02",
+      csv_desc: "mango",
+    },
+    {
+      file_content: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+                 for: 2m
+                 labels:
                   severity: warning
                 annotations:
-                  summary: Host out of memory (instance {{ $labels.instance }})
+                   summary: Host out of memory (instance {{ $labels.instance }})
                   description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}
-            "`,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
-  },
-  {
-    id: 5,
-    description:
-      "Host network interfaces are probably sending too much data  (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
-    yamlContent: ` expr: sum by (instance) (rate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: Host unusual network throughput out (instance {{ $labels.instance }})
-                  description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-            `,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostMemoryUnderMemoryPressure.yaml",
-  },
-  {
-    id: 6,
-    description:
-      "Host network interfaces are probably receiving too much data ",
-    yamlContent: ` expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: Host unusual network throughput in (instance {{ $labels.instance }})
-                  description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-            `,
-    githubInfo:
-      "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostUnusualNetworkThroughputIn.yaml",
-  },
-];
+             "`,
+      file_url:
+        "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
+      file_sha: "5335d5f2a06b228a8ec89b52f5e7981d8eb3d3f2",
+      csv_sha: "c3f35177c14478c99dcc005dba8ae4900ac04991",
+      file_id: "03",
+      csv_desc:
+        "Host network interfaces are probably sending too mucs sdf dfsdfsdfd  ss ssss sd sdffgdfgfh  fghsdfsdgdfh dfgfd gdfg dfg h data",
+    },
+  ],
+};
+
+// yaml_content,
+//       yaml_url,
+//       yaml_sha,
+//       csv_sha,
+//       yaml_id,
+//       csv_desc,
+
+// const alertRule = [
+//   {
+//     id: 3,
+//     description:
+//       "Node memory is filling up (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
+//     yamlContent: `expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+//                 for: 2m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host out of memory (instance {{ $labels.instance }})
+//                   description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}
+//             "`,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostOutOfMemory.yaml",
+//   },
+//   {
+//     id: 5,
+//     description:
+//       "Host network interfaces are probably sending too much data  (< 10% left)  VALUE = {{ $value }} LABELS = {{ $labels }}",
+//     yamlContent: ` expr: sum by (instance) (rate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
+//                 for: 5m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host unusual network throughput out (instance {{ $labels.instance }})
+//                   description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+//             `,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostMemoryUnderMemoryPressure.yaml",
+//   },
+//   {
+//     id: 6,
+//     description:
+//       "Host network interfaces are probably receiving too much data ",
+//     yamlContent: ` expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
+//                 for: 5m
+//                 labels:
+//                   severity: warning
+//                 annotations:
+//                   summary: Host unusual network throughput in (instance {{ $labels.instance }})
+//                   description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+//             `,
+//     githubInfo:
+//       "https://github.com/NexClipper/exporterhub.io/tree/main/contents/Node-Exporter/HostUnusualNetworkThroughputIn.yaml",
+//   },
+// ];

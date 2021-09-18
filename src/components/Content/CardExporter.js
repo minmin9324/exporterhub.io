@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { targetUnforkRepo } from "../../store/actions/exporterActions";
 import DeleteModal from "../Modal/DeleteModal";
 import { EXPORTER_API } from "../../config";
+import { ConsoleSqlOutlined } from "@ant-design/icons";
 
 const CardExporter = ({
   exporter,
@@ -38,10 +39,9 @@ const CardExporter = ({
   };
   const deleteExporter = (answer) => {
     if (answer === "Yes") {
-      console.log("dldk", exporter_id);
       axios({
         method: "delete",
-        url: `${EXPORTER_API}/exporter?exporter_id=${exporter_id}`,
+        url: `${EXPORTER_API}?exporter_id=${exporter_id}`,
         headers: {
           Authorization: sessionStorage.getItem("access_token"),
         },
@@ -52,6 +52,7 @@ const CardExporter = ({
           console.log(res);
         })
         .catch((error) => {
+          console.log(error);
           // setFailMessage(error.response?.data.message);
         });
     } else {

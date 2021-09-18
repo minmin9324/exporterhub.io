@@ -5,7 +5,7 @@ import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-twilight";
-// import axios from "axios";
+import axios from "axios";
 import { HiOutlineSave } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,8 +14,8 @@ import {
   edittingAlertRuleDescription,
   beforeEdittingAlertRule,
 } from "../../../store/actions/exporterActions";
-// import { API_SURVER } from "../../../config";
-// import { useParams } from "react-router";
+import { API_SURVER } from "../../../config";
+import { useParams } from "react-router";
 
 const ExporterTabCodeEditor = ({
   fileName,
@@ -23,8 +23,10 @@ const ExporterTabCodeEditor = ({
   fileContent,
   handleMode,
   type,
+  fileSha,
+  csvSha,
 }) => {
-  // const { id } = useParams();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const changeTheme = useSelector((store) => store.darkThemeReducer);
   const edittingAlert = useSelector((store) => store.alertRuleEdittingReducer);
@@ -39,7 +41,7 @@ const ExporterTabCodeEditor = ({
               content: "",
             }
           : {
-              fileName: fileName.slice(0, -5),
+              fileName: fileName.slice(0, fileName.lastIndexOf("_")),
               description: fileDescription,
               content: fileContent,
             }
@@ -50,7 +52,9 @@ const ExporterTabCodeEditor = ({
       edittingAlertRuleDescription(fileName === "" ? "" : fileDescription)
     );
     dispatch(
-      edittingAlertRuleFileName(fileName === "" ? "" : fileName.slice(0, -5))
+      edittingAlertRuleFileName(
+        fileName === "" ? "" : fileName.slice(0, fileName.lastIndexOf("_"))
+      )
     );
   }, [fileName]);
 
@@ -67,32 +71,51 @@ const ExporterTabCodeEditor = ({
       dispatch(edittingAlertRuleDescription(target.value));
     }
   };
-
+  console.log(
+    1,
+    edittingAlert.content,
+    "qqqqq",
+    edittingAlert.fileName,
+    "qqqqq",
+    fileSha,
+    "qqqqq",
+    csvSha,
+    "qqqqq",
+    edittingAlert.description
+  );
   const handlefetchGithub = () => {
-    console.log(edittingAlert, "저장할거야");
-    // axios({
-    //   method: "POST",
-    //   url: `${API_SURVER}/exporter/${id}/tab`,
-    //   headers: {
-    //     Authorization: sessionStorage.getItem("access_token"),
-    //   },
-    //   data: {
-    //     codeFileName: `${title}${type}`,
-    //     "code-SHA": codeSha,
-    //     mdFileName: `${title}${type}.md`,
-    //     mdFile: wholeEncode,
-    //     "md-SHA": mdSha,
-    //     message:
-    //       mdSha === null ? `CREATE ${title}${type}` : `UPDATE ${title}${type}`,
-    //   }
-    // })
-    //   .then(() => {
-    // handleMode();
-    //   })
-    //   .catch((err) => {
-    //     handleMode();
-    // });
-    //   };
+    console.log(
+      edittingAlert.content,
+      "qqqqq",
+      edittingAlert.fileName,
+      "qqqqq",
+      fileSha,
+      "qqqqq",
+      csvSha,
+      "qqqqq",
+      edittingAlert.description
+    );
+    const fileType = type.slice(1, type.lastIndexOf("."));
+    axios({
+      method: "POST",
+      url: `${API_SURVER}/exporter/${id}/tab?type=${fileType}`,
+      headers: {
+        Authorization: sessionStorage.getItem("access_token"),
+      },
+      data: {
+        file_content: edittingAlert.content,
+        file_name: edittingAlert.fileName,
+        file_sha: fileSha,
+        csv_sha: csvSha,
+        csv_desc: edittingAlert.description,
+      },
+    })
+      .then(() => {
+        handleMode();
+      })
+      .catch((err) => {
+        handleMode();
+      });
   };
 
   return (
@@ -104,7 +127,7 @@ const ExporterTabCodeEditor = ({
               id="fileName"
               value={edittingAlert.fileName}
               type="text"
-              placeholder="fileName"
+              placeholder="FileName"
               dark={changeTheme}
               onChange={handleFileInfo}
             />
@@ -114,7 +137,7 @@ const ExporterTabCodeEditor = ({
             id="description"
             as="textarea"
             name="content"
-            placeholder="description"
+            placeholder="Description"
             value={edittingAlert.description}
             cols="150"
             rows="3"
